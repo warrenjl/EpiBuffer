@@ -201,7 +201,8 @@ full_dists<-rdist(rbind(ind_locs,
 diag(full_dists)<-0.00
 full_dists<-full_dists/100.00
 
-results<-SpBuffer(mcmc_samples = 10000,
+ptm <- proc.time()
+results<-SpBuffer(mcmc_samples = 1000,
                   y = y,
                   x = x,
                   radius_seq = radius_seq,
@@ -213,5 +214,7 @@ results<-SpBuffer(mcmc_samples = 10000,
                   metrop_var_phi_star = rep(0.03^2, times = n_grid),
                   metrop_var_rho_phi = 0.50^2,
                   likelihood_indicator = 1)
+proc.time() - ptm
+
 
 

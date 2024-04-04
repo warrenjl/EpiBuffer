@@ -38,15 +38,12 @@ for(int j = 0; j < m; ++j){
     
    }
   
-arma::vec radius(n_ind); radius.fill(0.00);
+arma::uvec radius_pointer_uvec = arma::conv_to<arma::uvec>::from(radius_pointer);
+arma::mat temp_mat = exposure.cols(radius_pointer_uvec - 1);  
+arma::vec radius = radius_seq.elem(radius_pointer_uvec - 1);
 arma::mat Z(n_ind, 1); Z.fill(0.00);
-for(int j = 0; j < n_ind; ++j){
-    
-   radius(j) = radius_seq(radius_pointer(j) - 1);
-   Z.row(j) = exposure(j, (radius_pointer(j) - 1));   
-    
-   }
-  
+Z.col(0) = temp_mat.diag(0);
+
 return Rcpp::List::create(Rcpp::Named("radius") = radius,
                           Rcpp::Named("Z") = Z,
                           Rcpp::Named("G") = G);
