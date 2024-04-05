@@ -200,22 +200,35 @@ if(rho_phi_init.isNotNull()){
 
 Rcpp::List spatial_corr_info = spatial_corr_fun(rho_phi(0),
                                                 dists22);
-arma::vec phi_star(n_grid); phi_star.fill(0.00);
-Rcpp::List radius_Z_output = create_radius_Z_fun(radius_seq,
-                                                 exposure,
-                                                 w,
-                                                 n_ind,
-                                                 m,
-                                                 dists12,
-                                                 gamma.col(0),
-                                                 phi_star,
-                                                 rho_phi(0),
-                                                 spatial_corr_info[0]);
 
-radius.col(0) = Rcpp::as<arma::vec>(radius_Z_output[0]);
-arma::mat Z = Rcpp::as<arma::mat>(radius_Z_output[1]);
-arma::mat G = Rcpp::as<arma::mat>(radius_Z_output[2]);
+//Start:  Previous Function
+arma::vec phi_star(n_grid); phi_star.fill(0.00);
+arma::mat C = exp(-rho_phi(0)*dists12);
+arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(spatial_corr_info[0])*phi_star);
+arma::vec delta_star_trans = w*gamma.col(0) +
+                             phi_tilde;
+arma::vec delta_star = 1.00/(1.00 + exp(-delta_star_trans));
+arma::vec radius_pointer = ceil(delta_star*m);
+arma::uvec lt1 = find(radius_pointer < 1);
+radius_pointer.elem(lt1).fill(1);
+arma::uvec gtm = find(radius_pointer > m);
+radius_pointer.elem(gtm).fill(m);
+arma::mat G(n_ind, m); G.fill(0);
+for(int j = 0; j < m; ++j){
+  
+   arma::uvec ej = find(radius_pointer == (j + 1));
+   arma::colvec temp_col = G.col(j);
+   temp_col.elem(ej).fill(1);
+   G.col(j) = temp_col;
+  
+   }
+arma::uvec radius_pointer_uvec = arma::conv_to<arma::uvec>::from(radius_pointer);
+arma::mat temp_mat = exposure.cols(radius_pointer_uvec - 1);  
+radius.col(0) = radius_seq.elem(radius_pointer_uvec - 1);
+arma::mat Z(n_ind, 1); Z.fill(0.00);
+Z.col(0) = temp_mat.diag(0);
 theta_keep.col(0) = one_vec*(G*theta.col(0))/n_ind;
+//End:  Previous Function
 
 neg_two_loglike(0) = neg_two_loglike_update(y,
                                             x,
@@ -348,10 +361,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           off_set,
                                           w,
                                           n_ind,
-                                          n_grid,
                                           m,
                                           p_w,
-                                          dists12,
                                           one_vec,
                                           sigma2_gamma,
                                           omega,
@@ -359,20 +370,26 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           beta.col(j), 
                                           theta.col(j),
                                           gamma.col(j-1),
-                                          phi_star,
-                                          rho_phi(j-1),
-                                          spatial_corr_info[0],
-                                          radius_Z_output,
+                                          phi_tilde,
+                                          delta_star_trans,
+                                          delta_star,
+                                          radius_pointer,
+                                          G,
+                                          radius.col(j-1),
+                                          Z,
+                                          theta_keep.col(j-1),
                                           metrop_var_gamma,
                                           acctot_gamma);
+   
    gamma.col(j) = Rcpp::as<arma::vec>(gamma_output[0]); 
    acctot_gamma = Rcpp::as<arma::vec>(gamma_output[1]);
-   radius_Z_output = Rcpp::as<Rcpp::List>(gamma_output[2]);
-   
-   radius.col(j) = Rcpp::as<arma::vec>(radius_Z_output[0]);
-   Z = Rcpp::as<arma::mat>(radius_Z_output[1]);
-   G = Rcpp::as<arma::mat>(radius_Z_output[2]);
-   theta_keep.col(j) = one_vec*(G*theta.col(j))/n_ind;
+   delta_star_trans = Rcpp::as<arma::vec>(gamma_output[2]);
+   delta_star = Rcpp::as<arma::vec>(gamma_output[3]);
+   radius_pointer = Rcpp::as<arma::vec>(gamma_output[4]);
+   G = Rcpp::as<arma::mat>(gamma_output[5]);
+   radius.col(j) = Rcpp::as<arma::vec>(gamma_output[6]);
+   Z = Rcpp::as<arma::mat>(gamma_output[7]);
+   theta_keep.col(j) = Rcpp::as<arma::vec>(gamma_output[8]);
    
    //phi_star Update
    Rcpp::List phi_star_output = phi_star_update(x,
@@ -383,8 +400,6 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 n_ind,
                                                 n_grid,
                                                 m,
-                                                p_w,
-                                                dists12,
                                                 one_vec,
                                                 omega,
                                                 lambda,
@@ -393,20 +408,29 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 gamma.col(j),
                                                 phi_star,
                                                 sigma2_phi(j-1),
-                                                rho_phi(j-1),
                                                 spatial_corr_info[0],
-                                                radius_Z_output,
+                                                C,
+                                                phi_tilde,
+                                                delta_star_trans,
+                                                delta_star,
+                                                radius_pointer,
+                                                G,
+                                                radius.col(j),
+                                                Z,
+                                                theta_keep.col(j),
                                                 metrop_var_phi_star,
                                                 acctot_phi_star);
    
    phi_star = Rcpp::as<arma::vec>(phi_star_output[0]);
    acctot_phi_star = Rcpp::as<arma::vec>(phi_star_output[1]);
-   radius_Z_output = Rcpp::as<Rcpp::List>(phi_star_output[2]);
-   
-   radius.col(j) = Rcpp::as<arma::vec>(radius_Z_output[0]);
-   Z = Rcpp::as<arma::mat>(radius_Z_output[1]);
-   G = Rcpp::as<arma::mat>(radius_Z_output[2]);
-   theta_keep.col(j) = one_vec*(G*theta.col(j))/n_ind;
+   phi_tilde = Rcpp::as<arma::vec>(phi_star_output[2]);
+   delta_star_trans = Rcpp::as<arma::vec>(phi_star_output[3]);
+   delta_star = Rcpp::as<arma::vec>(phi_star_output[4]);
+   radius_pointer = Rcpp::as<arma::vec>(phi_star_output[5]);
+   G = Rcpp::as<arma::mat>(phi_star_output[6]);
+   radius.col(j) = Rcpp::as<arma::vec>(phi_star_output[7]);
+   Z = Rcpp::as<arma::mat>(phi_star_output[8]);
+   theta_keep.col(j) = Rcpp::as<arma::vec>(phi_star_output[9]);
    
    //sigma2_phi Update
    sigma2_phi(j) = sigma2_phi_update(n_grid,
@@ -422,9 +446,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               off_set,
                                               w,
                                               n_ind,
-                                              n_grid,
                                               m,
-                                              p_w,
                                               dists12,
                                               dists22,
                                               one_vec,
@@ -439,19 +461,30 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               sigma2_phi(j),
                                               rho_phi(j-1),
                                               spatial_corr_info,
-                                              radius_Z_output,
+                                              C,
+                                              phi_tilde,
+                                              delta_star_trans,
+                                              delta_star,
+                                              radius_pointer,
+                                              G,
+                                              radius.col(j),
+                                              Z,
+                                              theta_keep.col(j),
                                               metrop_var_rho_phi,
                                               acctot_rho_phi);
    
    rho_phi(j) = Rcpp::as<double>(rho_phi_output[0]);
    acctot_rho_phi = Rcpp::as<int>(rho_phi_output[1]);
    spatial_corr_info = Rcpp::as<Rcpp::List>(rho_phi_output[2]);
-   radius_Z_output = Rcpp::as<Rcpp::List>(rho_phi_output[3]);
-   
-   radius.col(j) = Rcpp::as<arma::vec>(radius_Z_output[0]);
-   Z = Rcpp::as<arma::mat>(radius_Z_output[1]);
-   G = Rcpp::as<arma::mat>(radius_Z_output[2]);
-   theta_keep.col(j) = one_vec*(G*theta.col(j))/n_ind;
+   C = Rcpp::as<arma::mat>(rho_phi_output[3]);
+   phi_tilde = Rcpp::as<arma::vec>(rho_phi_output[4]);
+   delta_star_trans = Rcpp::as<arma::vec>(rho_phi_output[5]);
+   delta_star = Rcpp::as<arma::vec>(rho_phi_output[6]);
+   radius_pointer = Rcpp::as<arma::vec>(rho_phi_output[7]);
+   G = Rcpp::as<arma::mat>(rho_phi_output[8]);
+   radius.col(j) = Rcpp::as<arma::vec>(rho_phi_output[9]);
+   Z = Rcpp::as<arma::mat>(rho_phi_output[10]);
+   theta_keep.col(j) = Rcpp::as<arma::vec>(rho_phi_output[11]);
    
    if(likelihood_indicator == 2){
      

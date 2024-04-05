@@ -13,8 +13,8 @@ create_radius_Z_fun <- function(radius_seq, exposure, w, n_ind, m, dists12, gamm
     .Call(`_SpBuffer_create_radius_Z_fun`, radius_seq, exposure, w, n_ind, m, dists12, gamma, phi_star, rho_phi, phi_star_corr_inv)
 }
 
-gamma_update <- function(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_star, rho_phi_old, phi_star_corr_inv, radius_Z_output, metrop_var_gamma, acctot_gamma) {
-    .Call(`_SpBuffer_gamma_update`, x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_star, rho_phi_old, phi_star_corr_inv, radius_Z_output, metrop_var_gamma, acctot_gamma)
+gamma_update <- function(x, radius_seq, exposure, off_set, w, n_ind, m, p_w, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_gamma, acctot_gamma) {
+    .Call(`_SpBuffer_gamma_update`, x, radius_seq, exposure, off_set, w, n_ind, m, p_w, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_gamma, acctot_gamma)
 }
 
 latent_update <- function(y, x, off_set, tri_als, likelihood_indicator, n_ind, r_old, beta_old, theta_keep_old, Z) {
@@ -25,8 +25,8 @@ neg_two_loglike_update <- function(y, x, off_set, tri_als, likelihood_indicator,
     .Call(`_SpBuffer_neg_two_loglike_update`, y, x, off_set, tri_als, likelihood_indicator, n_ind, r, sigma2_epsilon, beta, theta_keep, Z)
 }
 
-phi_star_update <- function(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, one_vec, omega, lambda, beta, theta, gamma, phi_star_old, sigma2_phi_old, rho_phi_old, phi_star_corr_inv, radius_Z_output, metrop_var_phi_star, acctot_phi_star) {
-    .Call(`_SpBuffer_phi_star_update`, x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, one_vec, omega, lambda, beta, theta, gamma, phi_star_old, sigma2_phi_old, rho_phi_old, phi_star_corr_inv, radius_Z_output, metrop_var_phi_star, acctot_phi_star)
+phi_star_update <- function(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, one_vec, omega, lambda, beta, theta, gamma, phi_star_old, sigma2_phi_old, phi_star_corr_inv, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_phi_star, acctot_phi_star) {
+    .Call(`_SpBuffer_phi_star_update`, x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, one_vec, omega, lambda, beta, theta, gamma, phi_star_old, sigma2_phi_old, phi_star_corr_inv, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_phi_star, acctot_phi_star)
 }
 
 r_update <- function(y, x, off_set, n_ind, a_r, b_r, beta, theta_keep, Z) {
@@ -37,8 +37,8 @@ rcpp_pgdraw <- function(b, c) {
     .Call(`_SpBuffer_rcpp_pgdraw`, b, c)
 }
 
-rho_phi_update <- function(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, radius_Z_output, metrop_var_rho_phi, acctot_rho_phi) {
-    .Call(`_SpBuffer_rho_phi_update`, x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, radius_Z_output, metrop_var_rho_phi, acctot_rho_phi)
+rho_phi_update <- function(x, radius_seq, exposure, off_set, w, n_ind, m, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_rho_phi, acctot_rho_phi) {
+    .Call(`_SpBuffer_rho_phi_update`, x, radius_seq, exposure, off_set, w, n_ind, m, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_rho_phi, acctot_rho_phi)
 }
 
 rho_theta_update <- function(m, l_rho_theta, u_rho_theta, theta, sigma2_theta, rho_theta_old, theta_corr_info, metrop_var_rho_theta, acctot_rho_theta_trans) {

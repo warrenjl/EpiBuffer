@@ -98,8 +98,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // gamma_update
-Rcpp::List gamma_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int n_grid, int m, int p_w, arma::mat dists12, arma::rowvec one_vec, double sigma2_gamma, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma_old, arma::vec phi_star, double rho_phi_old, arma::mat phi_star_corr_inv, Rcpp::List radius_Z_output, arma::vec metrop_var_gamma, arma::vec acctot_gamma);
-RcppExport SEXP _SpBuffer_gamma_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP n_gridSEXP, SEXP mSEXP, SEXP p_wSEXP, SEXP dists12SEXP, SEXP one_vecSEXP, SEXP sigma2_gammaSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gamma_oldSEXP, SEXP phi_starSEXP, SEXP rho_phi_oldSEXP, SEXP phi_star_corr_invSEXP, SEXP radius_Z_outputSEXP, SEXP metrop_var_gammaSEXP, SEXP acctot_gammaSEXP) {
+Rcpp::List gamma_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int m, int p_w, arma::rowvec one_vec, double sigma2_gamma, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma_old, arma::vec phi_tilde, arma::vec delta_star_trans, arma::vec delta_star, arma::vec radius_pointer, arma::mat G, arma::vec radius, arma::mat Z, arma::vec theta_keep, arma::vec metrop_var_gamma, arma::vec acctot_gamma);
+RcppExport SEXP _SpBuffer_gamma_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP mSEXP, SEXP p_wSEXP, SEXP one_vecSEXP, SEXP sigma2_gammaSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gamma_oldSEXP, SEXP phi_tildeSEXP, SEXP delta_star_transSEXP, SEXP delta_starSEXP, SEXP radius_pointerSEXP, SEXP GSEXP, SEXP radiusSEXP, SEXP ZSEXP, SEXP theta_keepSEXP, SEXP metrop_var_gammaSEXP, SEXP acctot_gammaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -109,10 +109,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type off_set(off_setSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
     Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
-    Rcpp::traits::input_parameter< int >::type n_grid(n_gridSEXP);
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
     Rcpp::traits::input_parameter< int >::type p_w(p_wSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type dists12(dists12SEXP);
     Rcpp::traits::input_parameter< arma::rowvec >::type one_vec(one_vecSEXP);
     Rcpp::traits::input_parameter< double >::type sigma2_gamma(sigma2_gammaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type omega(omegaSEXP);
@@ -120,13 +118,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type gamma_old(gamma_oldSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type phi_star(phi_starSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_phi_old(rho_phi_oldSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type phi_star_corr_inv(phi_star_corr_invSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type radius_Z_output(radius_Z_outputSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type phi_tilde(phi_tildeSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type delta_star_trans(delta_star_transSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type delta_star(delta_starSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius_pointer(radius_pointerSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type G(GSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta_keep(theta_keepSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type metrop_var_gamma(metrop_var_gammaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type acctot_gamma(acctot_gammaSEXP);
-    rcpp_result_gen = Rcpp::wrap(gamma_update(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_star, rho_phi_old, phi_star_corr_inv, radius_Z_output, metrop_var_gamma, acctot_gamma));
+    rcpp_result_gen = Rcpp::wrap(gamma_update(x, radius_seq, exposure, off_set, w, n_ind, m, p_w, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_gamma, acctot_gamma));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -172,8 +174,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // phi_star_update
-Rcpp::List phi_star_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int n_grid, int m, int p_w, arma::mat dists12, arma::rowvec one_vec, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma, arma::vec phi_star_old, double sigma2_phi_old, double rho_phi_old, arma::mat phi_star_corr_inv, Rcpp::List radius_Z_output, arma::vec metrop_var_phi_star, arma::vec acctot_phi_star);
-RcppExport SEXP _SpBuffer_phi_star_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP n_gridSEXP, SEXP mSEXP, SEXP p_wSEXP, SEXP dists12SEXP, SEXP one_vecSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gammaSEXP, SEXP phi_star_oldSEXP, SEXP sigma2_phi_oldSEXP, SEXP rho_phi_oldSEXP, SEXP phi_star_corr_invSEXP, SEXP radius_Z_outputSEXP, SEXP metrop_var_phi_starSEXP, SEXP acctot_phi_starSEXP) {
+Rcpp::List phi_star_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int n_grid, int m, arma::rowvec one_vec, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma, arma::vec phi_star_old, double sigma2_phi_old, arma::mat phi_star_corr_inv, arma::mat C, arma::vec phi_tilde, arma::vec delta_star_trans, arma::vec delta_star, arma::vec radius_pointer, arma::mat G, arma::vec radius, arma::mat Z, arma::vec theta_keep, arma::vec metrop_var_phi_star, arma::vec acctot_phi_star);
+RcppExport SEXP _SpBuffer_phi_star_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP n_gridSEXP, SEXP mSEXP, SEXP one_vecSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gammaSEXP, SEXP phi_star_oldSEXP, SEXP sigma2_phi_oldSEXP, SEXP phi_star_corr_invSEXP, SEXP CSEXP, SEXP phi_tildeSEXP, SEXP delta_star_transSEXP, SEXP delta_starSEXP, SEXP radius_pointerSEXP, SEXP GSEXP, SEXP radiusSEXP, SEXP ZSEXP, SEXP theta_keepSEXP, SEXP metrop_var_phi_starSEXP, SEXP acctot_phi_starSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -185,8 +187,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
     Rcpp::traits::input_parameter< int >::type n_grid(n_gridSEXP);
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type p_w(p_wSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type dists12(dists12SEXP);
     Rcpp::traits::input_parameter< arma::rowvec >::type one_vec(one_vecSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type omega(omegaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type lambda(lambdaSEXP);
@@ -195,12 +195,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type gamma(gammaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type phi_star_old(phi_star_oldSEXP);
     Rcpp::traits::input_parameter< double >::type sigma2_phi_old(sigma2_phi_oldSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_phi_old(rho_phi_oldSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type phi_star_corr_inv(phi_star_corr_invSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type radius_Z_output(radius_Z_outputSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type phi_tilde(phi_tildeSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type delta_star_trans(delta_star_transSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type delta_star(delta_starSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius_pointer(radius_pointerSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type G(GSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta_keep(theta_keepSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type metrop_var_phi_star(metrop_var_phi_starSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type acctot_phi_star(acctot_phi_starSEXP);
-    rcpp_result_gen = Rcpp::wrap(phi_star_update(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, one_vec, omega, lambda, beta, theta, gamma, phi_star_old, sigma2_phi_old, rho_phi_old, phi_star_corr_inv, radius_Z_output, metrop_var_phi_star, acctot_phi_star));
+    rcpp_result_gen = Rcpp::wrap(phi_star_update(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, one_vec, omega, lambda, beta, theta, gamma, phi_star_old, sigma2_phi_old, phi_star_corr_inv, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_phi_star, acctot_phi_star));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -236,8 +243,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rho_phi_update
-Rcpp::List rho_phi_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int n_grid, int m, int p_w, arma::mat dists12, arma::mat dists22, arma::rowvec one_vec, double a_rho_phi, double b_rho_phi, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma, arma::vec phi_star, double sigma2_phi, double rho_phi_old, Rcpp::List phi_star_corr_info, Rcpp::List radius_Z_output, double metrop_var_rho_phi, int acctot_rho_phi);
-RcppExport SEXP _SpBuffer_rho_phi_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP n_gridSEXP, SEXP mSEXP, SEXP p_wSEXP, SEXP dists12SEXP, SEXP dists22SEXP, SEXP one_vecSEXP, SEXP a_rho_phiSEXP, SEXP b_rho_phiSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gammaSEXP, SEXP phi_starSEXP, SEXP sigma2_phiSEXP, SEXP rho_phi_oldSEXP, SEXP phi_star_corr_infoSEXP, SEXP radius_Z_outputSEXP, SEXP metrop_var_rho_phiSEXP, SEXP acctot_rho_phiSEXP) {
+Rcpp::List rho_phi_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int m, arma::mat dists12, arma::mat dists22, arma::rowvec one_vec, double a_rho_phi, double b_rho_phi, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma, arma::vec phi_star, double sigma2_phi, double rho_phi_old, Rcpp::List phi_star_corr_info, arma::mat C, arma::vec phi_tilde, arma::vec delta_star_trans, arma::vec delta_star, arma::vec radius_pointer, arma::mat G, arma::vec radius, arma::mat Z, arma::vec theta_keep, double metrop_var_rho_phi, int acctot_rho_phi);
+RcppExport SEXP _SpBuffer_rho_phi_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP mSEXP, SEXP dists12SEXP, SEXP dists22SEXP, SEXP one_vecSEXP, SEXP a_rho_phiSEXP, SEXP b_rho_phiSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gammaSEXP, SEXP phi_starSEXP, SEXP sigma2_phiSEXP, SEXP rho_phi_oldSEXP, SEXP phi_star_corr_infoSEXP, SEXP CSEXP, SEXP phi_tildeSEXP, SEXP delta_star_transSEXP, SEXP delta_starSEXP, SEXP radius_pointerSEXP, SEXP GSEXP, SEXP radiusSEXP, SEXP ZSEXP, SEXP theta_keepSEXP, SEXP metrop_var_rho_phiSEXP, SEXP acctot_rho_phiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -247,9 +254,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type off_set(off_setSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
     Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
-    Rcpp::traits::input_parameter< int >::type n_grid(n_gridSEXP);
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type p_w(p_wSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type dists12(dists12SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type dists22(dists22SEXP);
     Rcpp::traits::input_parameter< arma::rowvec >::type one_vec(one_vecSEXP);
@@ -264,10 +269,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type sigma2_phi(sigma2_phiSEXP);
     Rcpp::traits::input_parameter< double >::type rho_phi_old(rho_phi_oldSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type phi_star_corr_info(phi_star_corr_infoSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type radius_Z_output(radius_Z_outputSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type C(CSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type phi_tilde(phi_tildeSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type delta_star_trans(delta_star_transSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type delta_star(delta_starSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius_pointer(radius_pointerSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type G(GSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta_keep(theta_keepSEXP);
     Rcpp::traits::input_parameter< double >::type metrop_var_rho_phi(metrop_var_rho_phiSEXP);
     Rcpp::traits::input_parameter< int >::type acctot_rho_phi(acctot_rho_phiSEXP);
-    rcpp_result_gen = Rcpp::wrap(rho_phi_update(x, radius_seq, exposure, off_set, w, n_ind, n_grid, m, p_w, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, radius_Z_output, metrop_var_rho_phi, acctot_rho_phi));
+    rcpp_result_gen = Rcpp::wrap(rho_phi_update(x, radius_seq, exposure, off_set, w, n_ind, m, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_rho_phi, acctot_rho_phi));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -392,13 +405,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SpBuffer_SpBuffer", (DL_FUNC) &_SpBuffer_SpBuffer, 37},
     {"_SpBuffer_beta_update", (DL_FUNC) &_SpBuffer_beta_update, 9},
     {"_SpBuffer_create_radius_Z_fun", (DL_FUNC) &_SpBuffer_create_radius_Z_fun, 10},
-    {"_SpBuffer_gamma_update", (DL_FUNC) &_SpBuffer_gamma_update, 23},
+    {"_SpBuffer_gamma_update", (DL_FUNC) &_SpBuffer_gamma_update, 25},
     {"_SpBuffer_latent_update", (DL_FUNC) &_SpBuffer_latent_update, 10},
     {"_SpBuffer_neg_two_loglike_update", (DL_FUNC) &_SpBuffer_neg_two_loglike_update, 11},
-    {"_SpBuffer_phi_star_update", (DL_FUNC) &_SpBuffer_phi_star_update, 23},
+    {"_SpBuffer_phi_star_update", (DL_FUNC) &_SpBuffer_phi_star_update, 28},
     {"_SpBuffer_r_update", (DL_FUNC) &_SpBuffer_r_update, 9},
     {"_SpBuffer_rcpp_pgdraw", (DL_FUNC) &_SpBuffer_rcpp_pgdraw, 2},
-    {"_SpBuffer_rho_phi_update", (DL_FUNC) &_SpBuffer_rho_phi_update, 26},
+    {"_SpBuffer_rho_phi_update", (DL_FUNC) &_SpBuffer_rho_phi_update, 32},
     {"_SpBuffer_rho_theta_update", (DL_FUNC) &_SpBuffer_rho_theta_update, 9},
     {"_SpBuffer_sigma2_epsilon_update", (DL_FUNC) &_SpBuffer_sigma2_epsilon_update, 9},
     {"_SpBuffer_sigma2_phi_update", (DL_FUNC) &_SpBuffer_sigma2_phi_update, 5},

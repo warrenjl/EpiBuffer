@@ -12,10 +12,8 @@ Rcpp::List gamma_update(arma::mat x,
                         arma::vec off_set,
                         arma::mat w,
                         int n_ind,
-                        int n_grid,
                         int m,
                         int p_w,
-                        arma::mat dists12,
                         arma::rowvec one_vec,
                         double sigma2_gamma,
                         arma::vec omega,
@@ -23,10 +21,14 @@ Rcpp::List gamma_update(arma::mat x,
                         arma::vec beta, 
                         arma::vec theta,
                         arma::vec gamma_old,
-                        arma::vec phi_star,
-                        double rho_phi_old,
-                        arma::mat phi_star_corr_inv,
-                        Rcpp::List radius_Z_output,
+                        arma::vec phi_tilde,
+                        arma::vec delta_star_trans,
+                        arma::vec delta_star,
+                        arma::vec radius_pointer,
+                        arma::mat G,
+                        arma::vec radius,
+                        arma::mat Z,
+                        arma::vec theta_keep,
                         arma::vec metrop_var_gamma,
                         arma::vec acctot_gamma){
   
@@ -38,33 +40,45 @@ arma::vec gamma = gamma_old;
 for(int j = 0; j < p_w; ++j){
   
    //Second
-   arma::mat Z = Rcpp::as<arma::mat>(radius_Z_output[1]);
-   arma::mat G = Rcpp::as<arma::mat>(radius_Z_output[2]);
-   arma::vec theta_keep = one_vec*(G*theta)/n_ind;
+   arma::vec delta_star_trans_old = delta_star_trans;
+   arma::vec delta_star_old = delta_star;
+   arma::vec radius_pointer_old = radius_pointer;
+   arma::mat G_old = G;
+   arma::vec radius_old = radius;
+   arma::mat Z_old = Z;
+   arma::vec theta_keep_old = theta_keep;
    
-   denom = -0.50*dot((lambda - off_set - x*beta - Z*theta_keep), (omega%(lambda - off_set - x*beta - Z*theta_keep))) +
+   denom = -0.50*dot((lambda - off_set - x*beta - Z_old*theta_keep_old), (omega%(lambda - off_set - x*beta - Z_old*theta_keep_old))) +
             -(0.50/sigma2_gamma)*pow(gamma(j), 2);
             
-   Rcpp::List radius_Z_output_old = radius_Z_output;
-    
    //First
    gamma(j) = R::rnorm(gamma_old(j),
                        sqrt(metrop_var_gamma(j)));
-   radius_Z_output = create_radius_Z_fun(radius_seq,
-                                         exposure,
-                                         w,
-                                         n_ind,
-                                         m,
-                                         dists12,
-                                         gamma,
-                                         phi_star,
-                                         rho_phi_old,
-                                         phi_star_corr_inv);
+   
+   //Start:  Previous Function
+   delta_star_trans = w*gamma +
+                      phi_tilde;
+   delta_star = 1.00/(1.00 + exp(-delta_star_trans));
+   radius_pointer = ceil(delta_star*m);
+   arma::uvec lt1 = find(radius_pointer < 1);
+   radius_pointer.elem(lt1).fill(1);
+   arma::uvec gtm = find(radius_pointer > m);
+   radius_pointer.elem(gtm).fill(m);
+   for(int j = 0; j < m; ++j){
      
-   Z = Rcpp::as<arma::mat>(radius_Z_output[1]);
-   G = Rcpp::as<arma::mat>(radius_Z_output[2]);
+      arma::uvec ej = find(radius_pointer == (j + 1));
+      arma::colvec temp_col = G.col(j);
+      temp_col.elem(ej).fill(1);
+      G.col(j) = temp_col;
+     
+      }
+   arma::uvec radius_pointer_uvec = arma::conv_to<arma::uvec>::from(radius_pointer);
+   arma::mat temp_mat = exposure.cols(radius_pointer_uvec - 1);  
+   radius = radius_seq.elem(radius_pointer_uvec - 1);
+   Z.col(0) = temp_mat.diag(0);
    theta_keep = one_vec*(G*theta)/n_ind;
-    
+   //End:  Previous Function
+     
    numer = -0.50*dot((lambda - off_set - x*beta - Z*theta_keep), (omega%(lambda - off_set - x*beta - Z*theta_keep))) +
            -(0.50/sigma2_gamma)*pow(gamma(j), 2);
       
@@ -74,7 +88,13 @@ for(int j = 0; j < p_w; ++j){
    if(ratio < R::runif(0.00, 1.00)){
         
      gamma(j) = gamma_old(j);
-     radius_Z_output = radius_Z_output_old;
+     delta_star_trans = delta_star_trans_old;
+     delta_star = delta_star_old;
+     radius_pointer = radius_pointer_old;
+     G = G_old;
+     radius = radius_old;
+     Z = Z_old;
+     theta_keep = theta_keep_old;
      acc = 0;
         
      }
@@ -85,9 +105,13 @@ for(int j = 0; j < p_w; ++j){
 
 return Rcpp::List::create(Rcpp::Named("gamma") = gamma,
                           Rcpp::Named("acctot_gamma") = acctot_gamma,
-                          Rcpp::Named("radius_Z_output") = radius_Z_output);
+                          Rcpp::Named("delta_star_trans") = delta_star_trans,
+                          Rcpp::Named("delta_star") = delta_star,
+                          Rcpp::Named("radius_pointer") = radius_pointer,
+                          Rcpp::Named("G") = G,
+                          Rcpp::Named("radius") = radius,
+                          Rcpp::Named("Z") = Z,
+                          Rcpp::Named("theta_keep") = theta_keep);
 
 }
-
-
 

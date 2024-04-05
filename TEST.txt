@@ -172,7 +172,7 @@ for(j in 1:m){
 plot(aic)
 plot(theta)
 
-n_grid<-250
+n_grid<-100
 grid_locs<-ind_locs[sample(c(1:n_ind), size = n_grid),]
 full_dists<-rdist.earth(rbind(ind_locs,
                               grid_locs),
@@ -180,7 +180,8 @@ full_dists<-rdist.earth(rbind(ind_locs,
 diag(full_dists)<-0.00
 full_dists<-full_dists/100.00
 
-results<-SpBuffer(mcmc_samples = 1000,
+library(SpBuffer)
+results<-SpBuffer(mcmc_samples = 110000,
                   y = y,
                   x = x,
                   radius_seq = radius_seq,
