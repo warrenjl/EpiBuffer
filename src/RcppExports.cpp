@@ -77,26 +77,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// create_radius_Z_fun
-Rcpp::List create_radius_Z_fun(arma::vec radius_seq, arma::mat exposure, arma::mat w, int n_ind, int m, arma::mat dists12, arma::vec gamma, arma::vec phi_star, double rho_phi, arma::mat phi_star_corr_inv);
-RcppExport SEXP _SpBuffer_create_radius_Z_fun(SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP mSEXP, SEXP dists12SEXP, SEXP gammaSEXP, SEXP phi_starSEXP, SEXP rho_phiSEXP, SEXP phi_star_corr_invSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type radius_seq(radius_seqSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type exposure(exposureSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
-    Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type dists12(dists12SEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type gamma(gammaSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type phi_star(phi_starSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_phi(rho_phiSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type phi_star_corr_inv(phi_star_corr_invSEXP);
-    rcpp_result_gen = Rcpp::wrap(create_radius_Z_fun(radius_seq, exposure, w, n_ind, m, dists12, gamma, phi_star, rho_phi, phi_star_corr_inv));
-    return rcpp_result_gen;
-END_RCPP
-}
 // gamma_update
 Rcpp::List gamma_update(arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::vec off_set, arma::mat w, int n_ind, int m, int p_w, arma::rowvec one_vec, double sigma2_gamma, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec theta, arma::vec gamma_old, arma::vec phi_tilde, arma::vec delta_star_trans, arma::vec delta_star, arma::vec radius_pointer, arma::mat G, arma::vec radius, arma::mat Z, arma::vec theta_keep, arma::vec metrop_var_gamma, arma::vec acctot_gamma);
 RcppExport SEXP _SpBuffer_gamma_update(SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP off_setSEXP, SEXP wSEXP, SEXP n_indSEXP, SEXP mSEXP, SEXP p_wSEXP, SEXP one_vecSEXP, SEXP sigma2_gammaSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP gamma_oldSEXP, SEXP phi_tildeSEXP, SEXP delta_star_transSEXP, SEXP delta_starSEXP, SEXP radius_pointerSEXP, SEXP GSEXP, SEXP radiusSEXP, SEXP ZSEXP, SEXP theta_keepSEXP, SEXP metrop_var_gammaSEXP, SEXP acctot_gammaSEXP) {
@@ -404,7 +384,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_SpBuffer_SpBuffer", (DL_FUNC) &_SpBuffer_SpBuffer, 37},
     {"_SpBuffer_beta_update", (DL_FUNC) &_SpBuffer_beta_update, 9},
-    {"_SpBuffer_create_radius_Z_fun", (DL_FUNC) &_SpBuffer_create_radius_Z_fun, 10},
     {"_SpBuffer_gamma_update", (DL_FUNC) &_SpBuffer_gamma_update, 25},
     {"_SpBuffer_latent_update", (DL_FUNC) &_SpBuffer_latent_update, 10},
     {"_SpBuffer_neg_two_loglike_update", (DL_FUNC) &_SpBuffer_neg_two_loglike_update, 11},

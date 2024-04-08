@@ -377,7 +377,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           G,
                                           radius.col(j-1),
                                           Z,
-                                          theta_keep.col(j-1),
+                                          theta_keep.col(j),
                                           metrop_var_gamma,
                                           acctot_gamma);
    

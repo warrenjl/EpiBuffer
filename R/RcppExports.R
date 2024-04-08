@@ -9,10 +9,6 @@ beta_update <- function(x, off_set, n_ind, p_x, sigma2_beta, omega, lambda, thet
     .Call(`_SpBuffer_beta_update`, x, off_set, n_ind, p_x, sigma2_beta, omega, lambda, theta_keep_old, Z)
 }
 
-create_radius_Z_fun <- function(radius_seq, exposure, w, n_ind, m, dists12, gamma, phi_star, rho_phi, phi_star_corr_inv) {
-    .Call(`_SpBuffer_create_radius_Z_fun`, radius_seq, exposure, w, n_ind, m, dists12, gamma, phi_star, rho_phi, phi_star_corr_inv)
-}
-
 gamma_update <- function(x, radius_seq, exposure, off_set, w, n_ind, m, p_w, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_gamma, acctot_gamma) {
     .Call(`_SpBuffer_gamma_update`, x, radius_seq, exposure, off_set, w, n_ind, m, p_w, one_vec, sigma2_gamma, omega, lambda, beta, theta, gamma_old, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_gamma, acctot_gamma)
 }
