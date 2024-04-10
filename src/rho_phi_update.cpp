@@ -80,6 +80,7 @@ arma::uvec lt1 = find(radius_pointer < 1);
 radius_pointer.elem(lt1).fill(1);
 arma::uvec gtm = find(radius_pointer > m);
 radius_pointer.elem(gtm).fill(m);
+G.fill(0);
 for(int j = 0; j < m; ++j){
   
    arma::uvec ej = find(radius_pointer == (j + 1));

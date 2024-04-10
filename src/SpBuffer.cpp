@@ -559,7 +559,7 @@ for(int j = 1; j < mcmc_samples; ++j){
      Rcpp::Rcout << "******************************" << std::endl;
     
      }
-  
+   
    }
                                   
 return Rcpp::List::create(Rcpp::Named("r") = r,
