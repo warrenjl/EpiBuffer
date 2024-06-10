@@ -24,7 +24,7 @@
 //#include <omp.h>
 
 #include "RcppArmadillo.h"
-#include "SpBuffer.h"
+#include "EpiBuffer.h"
 using namespace arma;
 using namespace Rcpp;
 

@@ -11,6 +11,40 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// SingleBuffer
+Rcpp::List SingleBuffer(int mcmc_samples, arma::vec y, arma::mat x, arma::vec radius_seq, arma::mat exposure, double metrop_var_rho_theta, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<Rcpp::NumericVector> trials, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_beta_prior, Rcpp::Nullable<double> a_sigma2_theta_prior, Rcpp::Nullable<double> b_sigma2_theta_prior, Rcpp::Nullable<double> l_rho_theta_prior, Rcpp::Nullable<double> u_rho_theta_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> theta_keep_init, Rcpp::Nullable<double> sigma2_theta_init, Rcpp::Nullable<double> rho_theta_init);
+RcppExport SEXP _SpBuffer_SingleBuffer(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP metrop_var_rho_thetaSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP trialsSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_beta_priorSEXP, SEXP a_sigma2_theta_priorSEXP, SEXP b_sigma2_theta_priorSEXP, SEXP l_rho_theta_priorSEXP, SEXP u_rho_theta_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP theta_keep_initSEXP, SEXP sigma2_theta_initSEXP, SEXP rho_theta_initSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type mcmc_samples(mcmc_samplesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type radius_seq(radius_seqSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type exposure(exposureSEXP);
+    Rcpp::traits::input_parameter< double >::type metrop_var_rho_theta(metrop_var_rho_thetaSEXP);
+    Rcpp::traits::input_parameter< int >::type likelihood_indicator(likelihood_indicatorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type offset(offsetSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type trials(trialsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_r_prior(a_r_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type b_r_prior(b_r_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_sigma2_epsilon_prior(a_sigma2_epsilon_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type b_sigma2_epsilon_prior(b_sigma2_epsilon_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_beta_prior(sigma2_beta_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_sigma2_theta_prior(a_sigma2_theta_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type b_sigma2_theta_prior(b_sigma2_theta_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type l_rho_theta_prior(l_rho_theta_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type u_rho_theta_prior(u_rho_theta_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type r_init(r_initSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_epsilon_init(sigma2_epsilon_initSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type beta_init(beta_initSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type theta_keep_init(theta_keep_initSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_theta_init(sigma2_theta_initSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type rho_theta_init(rho_theta_initSEXP);
+    rcpp_result_gen = Rcpp::wrap(SingleBuffer(mcmc_samples, y, x, radius_seq, exposure, metrop_var_rho_theta, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, a_sigma2_theta_prior, b_sigma2_theta_prior, l_rho_theta_prior, u_rho_theta_prior, r_init, sigma2_epsilon_init, beta_init, theta_keep_init, sigma2_theta_init, rho_theta_init));
+    return rcpp_result_gen;
+END_RCPP
+}
 // SpBuffer
 Rcpp::List SpBuffer(int mcmc_samples, arma::vec y, arma::mat x, arma::vec radius_seq, arma::mat exposure, arma::mat w, arma::mat full_dists, double metrop_var_rho_theta, arma::vec metrop_var_gamma, arma::vec metrop_var_phi_star, double metrop_var_rho_phi, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<Rcpp::NumericVector> trials, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_beta_prior, Rcpp::Nullable<double> a_sigma2_theta_prior, Rcpp::Nullable<double> b_sigma2_theta_prior, Rcpp::Nullable<double> l_rho_theta_prior, Rcpp::Nullable<double> u_rho_theta_prior, Rcpp::Nullable<double> sigma2_gamma_prior, Rcpp::Nullable<double> a_sigma2_phi_prior, Rcpp::Nullable<double> b_sigma2_phi_prior, Rcpp::Nullable<double> a_rho_phi_prior, Rcpp::Nullable<double> b_rho_phi_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> theta_keep_init, Rcpp::Nullable<double> sigma2_theta_init, Rcpp::Nullable<double> rho_theta_init, Rcpp::Nullable<Rcpp::NumericVector> gamma_init, Rcpp::Nullable<double> sigma2_phi_init, Rcpp::Nullable<double> rho_phi_init);
 RcppExport SEXP _SpBuffer_SpBuffer(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP radius_seqSEXP, SEXP exposureSEXP, SEXP wSEXP, SEXP full_distsSEXP, SEXP metrop_var_rho_thetaSEXP, SEXP metrop_var_gammaSEXP, SEXP metrop_var_phi_starSEXP, SEXP metrop_var_rho_phiSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP trialsSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_beta_priorSEXP, SEXP a_sigma2_theta_priorSEXP, SEXP b_sigma2_theta_priorSEXP, SEXP l_rho_theta_priorSEXP, SEXP u_rho_theta_priorSEXP, SEXP sigma2_gamma_priorSEXP, SEXP a_sigma2_phi_priorSEXP, SEXP b_sigma2_phi_priorSEXP, SEXP a_rho_phi_priorSEXP, SEXP b_rho_phi_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP theta_keep_initSEXP, SEXP sigma2_theta_initSEXP, SEXP rho_theta_initSEXP, SEXP gamma_initSEXP, SEXP sigma2_phi_initSEXP, SEXP rho_phi_initSEXP) {
@@ -382,6 +416,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SpBuffer_SingleBuffer", (DL_FUNC) &_SpBuffer_SingleBuffer, 24},
     {"_SpBuffer_SpBuffer", (DL_FUNC) &_SpBuffer_SpBuffer, 37},
     {"_SpBuffer_beta_update", (DL_FUNC) &_SpBuffer_beta_update, 9},
     {"_SpBuffer_gamma_update", (DL_FUNC) &_SpBuffer_gamma_update, 25},

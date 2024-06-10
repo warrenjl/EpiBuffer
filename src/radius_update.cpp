@@ -6,40 +6,44 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
 
-Rcpp::List gamma_update(arma::mat x,
-                        arma::vec radius_seq,
-                        arma::mat exposure,
-                        arma::vec off_set,
-                        arma::mat w,
-                        int n_ind,
-                        int m,
-                        int p_w,
-                        arma::rowvec one_vec,
-                        double sigma2_gamma,
-                        arma::vec omega,
-                        arma::vec lambda,
-                        arma::vec beta, 
-                        arma::vec theta,
-                        arma::vec gamma_old,
-                        arma::vec phi_tilde,
-                        arma::vec delta_star_trans,
-                        arma::vec delta_star,
-                        arma::vec radius_pointer,
-                        arma::mat G,
-                        arma::vec radius,
-                        arma::mat Z,
-                        arma::vec theta_keep,
-                        arma::vec metrop_var_gamma,
-                        arma::vec acctot_gamma){
-  
+Rcpp::List radius_update(arma::mat x,
+                           arma::vec radius_seq,
+                           arma::mat exposure,
+                           arma::vec off_set,
+                           arma::mat w,
+                           int n_ind,
+                           int n_grid,
+                           int m,
+                           arma::rowvec one_vec,
+                           arma::vec omega,
+                           arma::vec lambda,
+                           arma::vec beta, 
+                           arma::vec theta,
+                           arma::vec gamma,
+                           arma::vec phi_star_old,
+                           double sigma2_phi_old,
+                           arma::mat phi_star_corr_inv,
+                           arma::mat C,
+                           arma::vec phi_tilde,
+                           arma::vec delta_star_trans,
+                           arma::vec delta_star,
+                           arma::vec radius_pointer,
+                           arma::mat G,
+                           arma::vec radius,
+                           arma::mat Z,
+                           arma::vec theta_keep,
+                           arma::vec metrop_var_phi_star,
+                           arma::vec acctot_phi_star){
+
 double denom = 0.00;
 double numer = 0.00;
 
-arma::vec gamma = gamma_old;
+arma::vec phi_star = phi_star_old; 
 
-for(int j = 0; j < p_w; ++j){
-  
+for(int j = 0; j < n_grid; ++j){
+
    //Second
+   arma::vec phi_tilde_old = phi_tilde;
    arma::vec delta_star_trans_old = delta_star_trans;
    arma::vec delta_star_old = delta_star;
    arma::vec radius_pointer_old = radius_pointer;
@@ -47,15 +51,16 @@ for(int j = 0; j < p_w; ++j){
    arma::vec radius_old = radius;
    arma::mat Z_old = Z;
    arma::vec theta_keep_old = theta_keep;
-   
+  
    denom = -0.50*dot((lambda - off_set - x*beta - Z_old*theta_keep_old), (omega%(lambda - off_set - x*beta - Z_old*theta_keep_old))) +
-            -(0.50/sigma2_gamma)*pow(gamma(j), 2);
-            
+           -(0.50/sigma2_phi_old)*dot(phi_star, (phi_star_corr_inv*phi_star));
+   
    //First
-   gamma(j) = R::rnorm(gamma_old(j),
-                       sqrt(metrop_var_gamma(j)));
+   phi_star(j) = R::rnorm(phi_star_old(j),
+                          sqrt(metrop_var_phi_star(j)));
    
    //Start:  Previous Function
+   phi_tilde = C*(phi_star_corr_inv*phi_star);
    delta_star_trans = w*gamma +
                       phi_tilde;
    delta_star = 1.00/(1.00 + exp(-delta_star_trans));
@@ -79,16 +84,17 @@ for(int j = 0; j < p_w; ++j){
    Z.col(0) = temp_mat.diag(0);
    theta_keep = one_vec*(G*theta)/n_ind;
    //End:  Previous Function
-     
+   
    numer = -0.50*dot((lambda - off_set - x*beta - Z*theta_keep), (omega%(lambda - off_set - x*beta - Z*theta_keep))) +
-           -(0.50/sigma2_gamma)*pow(gamma(j), 2);
-      
-   /*Decision*/
-   double ratio = exp(numer - denom);   
-   double acc = 1;
+           -(0.50/sigma2_phi_old)*dot(phi_star, (phi_star_corr_inv*phi_star));
+           
+   //Decision
+   double ratio = exp(numer - denom);
+   int acc = 1;
    if(ratio < R::runif(0.00, 1.00)){
-        
-     gamma(j) = gamma_old(j);
+       
+     phi_star(j) = phi_star_old(j);
+     phi_tilde = phi_tilde_old;
      delta_star_trans = delta_star_trans_old;
      delta_star = delta_star_old;
      radius_pointer = radius_pointer_old;
@@ -97,15 +103,16 @@ for(int j = 0; j < p_w; ++j){
      Z = Z_old;
      theta_keep = theta_keep_old;
      acc = 0;
-        
+     
      }
-   acctot_gamma(j) = acctot_gamma(j) + 
-                     acc;
-        
-   }
+   acctot_phi_star(j) = acctot_phi_star(j) + 
+                        acc;
 
-return Rcpp::List::create(Rcpp::Named("gamma") = gamma,
-                          Rcpp::Named("acctot_gamma") = acctot_gamma,
+   }
+      
+return Rcpp::List::create(Rcpp::Named("phi_star") = phi_star,
+                          Rcpp::Named("acctot_phi_star") = acctot_phi_star,
+                          Rcpp::Named("phi_tilde") = phi_tilde,
                           Rcpp::Named("delta_star_trans") = delta_star_trans,
                           Rcpp::Named("delta_star") = delta_star,
                           Rcpp::Named("radius_pointer") = radius_pointer,
@@ -113,6 +120,8 @@ return Rcpp::List::create(Rcpp::Named("gamma") = gamma,
                           Rcpp::Named("radius") = radius,
                           Rcpp::Named("Z") = Z,
                           Rcpp::Named("theta_keep") = theta_keep);
-
+                          
 }
+
+
 

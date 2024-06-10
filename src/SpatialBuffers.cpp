@@ -1,49 +1,49 @@
 #include "RcppArmadillo.h"
-#include "SpBuffer.h"
+#include "EpiBuffer.h"
 using namespace arma;
 using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
 
-Rcpp::List SpBuffer(int mcmc_samples,
-                    arma::vec y,
-                    arma::mat x,
-                    arma::vec radius_seq,
-                    arma::mat exposure,
-                    arma::mat w,
-                    arma::mat full_dists,
-                    double metrop_var_rho_theta,
-                    arma::vec metrop_var_gamma,
-                    arma::vec metrop_var_phi_star,
-                    double metrop_var_rho_phi,
-                    int likelihood_indicator,
-                    Rcpp::Nullable<Rcpp::NumericVector> offset = R_NilValue,
-                    Rcpp::Nullable<Rcpp::NumericVector> trials = R_NilValue,
-                    Rcpp::Nullable<double> a_r_prior = R_NilValue,
-                    Rcpp::Nullable<double> b_r_prior = R_NilValue,
-                    Rcpp::Nullable<double> a_sigma2_epsilon_prior = R_NilValue,
-                    Rcpp::Nullable<double> b_sigma2_epsilon_prior = R_NilValue,
-                    Rcpp::Nullable<double> sigma2_beta_prior = R_NilValue,
-                    Rcpp::Nullable<double> a_sigma2_theta_prior = R_NilValue,
-                    Rcpp::Nullable<double> b_sigma2_theta_prior = R_NilValue,
-                    Rcpp::Nullable<double> l_rho_theta_prior = R_NilValue,
-                    Rcpp::Nullable<double> u_rho_theta_prior = R_NilValue,
-                    Rcpp::Nullable<double> sigma2_gamma_prior = R_NilValue,
-                    Rcpp::Nullable<double> a_sigma2_phi_prior = R_NilValue,
-                    Rcpp::Nullable<double> b_sigma2_phi_prior = R_NilValue,
-                    Rcpp::Nullable<double> a_rho_phi_prior = R_NilValue,
-                    Rcpp::Nullable<double> b_rho_phi_prior = R_NilValue,
-                    Rcpp::Nullable<double> r_init = R_NilValue,
-                    Rcpp::Nullable<double> sigma2_epsilon_init = R_NilValue,
-                    Rcpp::Nullable<Rcpp::NumericVector> beta_init = R_NilValue,
-                    Rcpp::Nullable<double> theta_keep_init = R_NilValue,
-                    Rcpp::Nullable<double> sigma2_theta_init = R_NilValue,
-                    Rcpp::Nullable<double> rho_theta_init = R_NilValue,
-                    Rcpp::Nullable<Rcpp::NumericVector> gamma_init = R_NilValue,
-                    Rcpp::Nullable<double> sigma2_phi_init = R_NilValue,
-                    Rcpp::Nullable<double> rho_phi_init = R_NilValue){
-
+Rcpp::List SpatialBuffers(int mcmc_samples,
+                          arma::vec y,
+                          arma::mat x,
+                          arma::vec radius_seq,
+                          arma::mat exposure,
+                          arma::mat w,
+                          arma::mat full_dists,
+                          double metrop_var_rho_theta,
+                          arma::vec metrop_var_gamma,
+                          arma::vec metrop_var_phi_star,
+                          double metrop_var_rho_phi,
+                          int likelihood_indicator,
+                          Rcpp::Nullable<Rcpp::NumericVector> offset = R_NilValue,
+                          Rcpp::Nullable<Rcpp::NumericVector> trials = R_NilValue,
+                          Rcpp::Nullable<double> a_r_prior = R_NilValue,
+                          Rcpp::Nullable<double> b_r_prior = R_NilValue,
+                          Rcpp::Nullable<double> a_sigma2_epsilon_prior = R_NilValue,
+                          Rcpp::Nullable<double> b_sigma2_epsilon_prior = R_NilValue,
+                          Rcpp::Nullable<double> sigma2_beta_prior = R_NilValue,
+                          Rcpp::Nullable<double> a_sigma2_theta_prior = R_NilValue,
+                          Rcpp::Nullable<double> b_sigma2_theta_prior = R_NilValue,
+                          Rcpp::Nullable<double> l_rho_theta_prior = R_NilValue,
+                          Rcpp::Nullable<double> u_rho_theta_prior = R_NilValue,
+                          Rcpp::Nullable<double> sigma2_gamma_prior = R_NilValue,
+                          Rcpp::Nullable<double> a_sigma2_phi_prior = R_NilValue,
+                          Rcpp::Nullable<double> b_sigma2_phi_prior = R_NilValue,
+                          Rcpp::Nullable<double> a_rho_phi_prior = R_NilValue,
+                          Rcpp::Nullable<double> b_rho_phi_prior = R_NilValue,
+                          Rcpp::Nullable<double> r_init = R_NilValue,
+                          Rcpp::Nullable<double> sigma2_epsilon_init = R_NilValue,
+                          Rcpp::Nullable<Rcpp::NumericVector> beta_init = R_NilValue,
+                          Rcpp::Nullable<double> theta_keep_init = R_NilValue,
+                          Rcpp::Nullable<double> sigma2_theta_init = R_NilValue,
+                          Rcpp::Nullable<double> rho_theta_init = R_NilValue,
+                          Rcpp::Nullable<Rcpp::NumericVector> gamma_init = R_NilValue,
+                          Rcpp::Nullable<double> sigma2_phi_init = R_NilValue,
+                          Rcpp::Nullable<double> rho_phi_init = R_NilValue){
+  
 //Defining Parameters and Quantities of Interest
 int p_x = x.n_cols;
 int m = exposure.n_cols;

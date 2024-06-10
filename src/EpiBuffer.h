@@ -1,5 +1,5 @@
-#ifndef __SpBuffer__
-#define __SpBuffer__
+#ifndef __EpiBuffer__
+#define __EpiBuffer__
 
 arma::vec rcpp_pgdraw(arma::vec b, 
                       arma::vec c);
@@ -81,6 +81,19 @@ Rcpp::List theta_update(arma::mat x,
                         arma::mat theta_corr_inv,
                         arma::mat G,
                         arma::mat Z);
+
+Rcpp::List theta_single_update(arma::mat x, 
+                               arma::vec off_set,
+                               int n_ind,
+                               int m,
+                               arma::vec omega,
+                               arma::vec lambda,
+                               arma::vec beta,
+                               double sigma2_theta_old,
+                               double rho_theta_old,
+                               arma::mat theta_corr_inv,
+                               arma::uvec radius_pointer_old, 
+                               arma::mat Z);
 
 double sigma2_theta_update(int m,
                            double a_sigma2_theta,
@@ -193,6 +206,32 @@ Rcpp::List rho_phi_update(arma::mat x,
                           double metrop_var_rho_phi,
                           int acctot_rho_phi);
 
+Rcpp::List SingleBuffer(int mcmc_samples,
+                        arma::vec y,
+                        arma::mat x,
+                        arma::vec radius_seq,
+                        arma::mat exposure,
+                        double metrop_var_rho_theta,
+                        int likelihood_indicator,
+                        Rcpp::Nullable<Rcpp::NumericVector> offset,
+                        Rcpp::Nullable<Rcpp::NumericVector> trials,
+                        Rcpp::Nullable<double> a_r_prior,
+                        Rcpp::Nullable<double> b_r_prior,
+                        Rcpp::Nullable<double> a_sigma2_epsilon_prior,
+                        Rcpp::Nullable<double> b_sigma2_epsilon_prior,
+                        Rcpp::Nullable<double> sigma2_beta_prior,
+                        Rcpp::Nullable<double> a_sigma2_theta_prior,
+                        Rcpp::Nullable<double> b_sigma2_theta_prior,
+                        Rcpp::Nullable<double> l_rho_theta_prior,
+                        Rcpp::Nullable<double> u_rho_theta_prior,
+                        Rcpp::Nullable<double> r_init,
+                        Rcpp::Nullable<double> sigma2_epsilon_init,
+                        Rcpp::Nullable<Rcpp::NumericVector> beta_init,
+                        Rcpp::Nullable<double> theta_keep_init,
+                        Rcpp::Nullable<double> sigma2_theta_init,
+                        Rcpp::Nullable<double> rho_theta_init,
+                        Rcpp::Nullable<double> radius_pointer_init);
+
 Rcpp::List SpBuffer(int mcmc_samples,
                     arma::vec y,
                     arma::mat x,
@@ -231,4 +270,4 @@ Rcpp::List SpBuffer(int mcmc_samples,
                     Rcpp::Nullable<double> sigma2_phi_init,
                     Rcpp::Nullable<double> rho_phi_init);
 
-#endif // __SpBuffer__
+#endif // __EpiBuffer__
