@@ -245,7 +245,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    theta.col(j) = Rcpp::as<arma::vec>(theta_output[0]);
    theta_keep.col(j) = Rcpp::as<arma::vec>(theta_output[1]);
    
-   //sigma2_theta Update
+   //sigma2_theta Updates
    sigma2_theta(j) = sigma2_theta_update(m,
                                          a_sigma2_theta,
                                          b_sigma2_theta,
