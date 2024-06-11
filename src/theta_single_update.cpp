@@ -16,7 +16,7 @@ Rcpp::List theta_single_update(arma::mat x,
                                double sigma2_theta_old,
                                double rho_theta_old,
                                arma::mat theta_corr_inv,
-                               arma::uvec radius_pointer_old, 
+                               double radius_pointer_old, 
                                arma::mat Z){
 
 arma::mat omega_mat(n_ind, m);
@@ -24,18 +24,17 @@ for(int j = 0; j < m; ++j){
    omega_mat.col(j) = omega;
    }
 
-arma::mat full_mat = Z;
-arma::mat full_mat_trans = trans(full_mat);
+arma::mat Z_trans = trans(Z);
 
-arma::mat cov_theta = inv_sympd(full_mat_trans*(omega_mat%full_mat) + 
+arma::mat cov_theta = inv_sympd(Z_trans*(omega_mat%Z) + 
                                 ((1.00 - pow(rho_theta_old, 2.00))/sigma2_theta_old)*theta_corr_inv);
 
-arma::vec mean_theta = cov_theta*(full_mat_trans*(omega%(lambda - off_set - x*beta)));
+arma::vec mean_theta = cov_theta*(Z_trans*(omega%(lambda - off_set - x*beta)));
 
 arma::mat ind_norms = arma::randn(1, m);
 arma::vec theta = mean_theta + 
                   trans(ind_norms*arma::chol(cov_theta));
-arma::vec theta_keep = theta(radius_pointer_old - 1);
+double theta_keep = theta(radius_pointer_old - 1);
 
 return Rcpp::List::create(Rcpp::Named("theta") = theta,
                           Rcpp::Named("theta_keep") = theta_keep);

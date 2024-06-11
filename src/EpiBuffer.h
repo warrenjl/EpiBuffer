@@ -68,6 +68,19 @@ arma::vec beta_update(arma::mat x,
                       arma::vec theta_keep_old,
                       arma::mat Z);
 
+Rcpp::List theta_single_update(arma::mat x, 
+                               arma::vec off_set,
+                               int n_ind,
+                               int m,
+                               arma::vec omega,
+                               arma::vec lambda,
+                               arma::vec beta,
+                               double sigma2_theta_old,
+                               double rho_theta_old,
+                               arma::mat theta_corr_inv,
+                               arma::uvec radius_pointer_old, 
+                               arma::mat Z);
+
 Rcpp::List theta_update(arma::mat x, 
                         arma::vec off_set,
                         int n_ind,
@@ -92,7 +105,7 @@ Rcpp::List theta_single_update(arma::mat x,
                                double sigma2_theta_old,
                                double rho_theta_old,
                                arma::mat theta_corr_inv,
-                               arma::uvec radius_pointer_old, 
+                               double radius_pointer_old, 
                                arma::mat Z);
 
 double sigma2_theta_update(int m,
@@ -137,6 +150,23 @@ Rcpp::List gamma_update(arma::mat x,
                         arma::vec theta_keep,
                         arma::vec metrop_var_gamma,
                         arma::vec acctot_gamma);
+
+Rcpp::List radius_update(arma::vec y,
+                         arma::mat x,
+                         arma::vec radius_seq,
+                         arma::mat exposure,
+                         arma::vec off_set,
+                         arma::vec tri_als,
+                         int likelihood_indicator,
+                         int n_ind,
+                         int m,
+                         int r_old,
+                         double sigma2_epsilon,
+                         arma::vec beta, 
+                         arma::vec theta,
+                         arma::vec radius,
+                         arma::mat Z,
+                         arma::vec theta_keep);
 
 Rcpp::List phi_star_update(arma::mat x,
                            arma::vec radius_seq,

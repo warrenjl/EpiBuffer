@@ -43,8 +43,8 @@ arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
 arma::mat theta(m, mcmc_samples); theta.fill(0.00);
 arma::vec sigma2_theta(mcmc_samples); sigma2_theta.fill(0.00);
 arma::vec rho_theta(mcmc_samples); rho_theta.fill(0.00);
-arma::mat radius(1, mcmc_samples); radius.fill(0.00);
-arma::mat theta_keep(1, mcmc_samples); theta_keep.fill(0.00);
+arma::vec radius(mcmc_samples); radius.fill(0.00);
+arma::vec theta_keep(mcmc_samples); theta_keep.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
@@ -268,7 +268,26 @@ for(int j = 1; j < mcmc_samples; ++j){
    theta_corr_info = Rcpp::as<Rcpp::List>(rho_theta_output[2]);
    
    //radius Update
-   
+   Rcpp::List radius_output = radius_update(y,
+                                            x,
+                                            radius_seq,
+                                            exposure,
+                                            off_set,
+                                            tri_als,
+                                            likelihood_indicator,
+                                            n_ind,
+                                            m,
+                                            r(j-1),
+                                            sigma2_epsilon(j),
+                                            beta.col(j), 
+                                            theta.col(j),
+                                            radius(j),
+                                            Z,
+                                            theta_keep.col(0));
+   radius_pointer(0) = Rcpp::as<arma::double>(radius_output[0]);
+   radius(j) = Rcpp::as<arma::double>(radius_output[1]);
+   Z.col(0) = Rcpp::as<arma::vec>(radius_output[2]);
+   theta_keep.col(j) = Rcpp::as<arma::vec>(radius_output[3]);
    
    if(likelihood_indicator == 2){
      
