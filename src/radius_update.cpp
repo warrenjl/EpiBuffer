@@ -24,11 +24,12 @@ Rcpp::List radius_update(arma::vec y,
 
 arma::vec radius_log_vec(n_ind); radius_log_vec.fill(0.00);
 arma::vec radius_log_val(m); radius_log_val.fill(0.00);
+
 for(int j = 0; j < m; ++j){
 
    arma::vec mu = off_set +
                   x*beta + 
-                  exposure.col(j)*theta_keep;
+                  exposure.col(j)*theta(j);
   
    if(likelihood_indicator == 0){
     
@@ -78,16 +79,19 @@ for(int j = 0; j < m; ++j){
    }
   
 IntegerVector sample_set = seq(1, m);
-int radius_pointer = sampleRcpp(wrap(sample_set), 
-                                1, 
-                                TRUE, 
-                                wrap(radius_probs))(0);
+arma::vec radius_pointer(1);
+radius_pointer(0) = sampleRcpp(wrap(sample_set), 
+                               1, 
+                               TRUE, 
+                               wrap(radius_probs))(0);
 arma::uvec radius_pointer_uvec = arma::conv_to<arma::uvec>::from(radius_pointer);
-double radius = radius_seq.elem(radius_pointer_uvec - 1);
-Z.col(0) = exposure.cols(radius_pointer_uvec - 1);
-theta_keep = theta.col(radius_pointer - 1);
+arma::vec radius = radius_seq.elem(radius_pointer_uvec - 1);
+Z.fill(0.00);
+Z.cols(radius_pointer_uvec - 1) = exposure.cols(radius_pointer_uvec - 1);
+theta_keep = theta.elem(radius_pointer_uvec - 1);
 
 return Rcpp::List::create(Rcpp::Named("radius_pointer") = radius_pointer,
+                          Rcpp::Named("radius_pointer_uvec") = radius_pointer_uvec,
                           Rcpp::Named("radius") = radius,
                           Rcpp::Named("Z") = Z,
                           Rcpp::Named("theta_keep") = theta_keep);

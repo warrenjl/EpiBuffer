@@ -1,24 +1,24 @@
-\name{SpBuffer-package}
-\alias{SpBuffer-package}
-\alias{SpBuffer}
+\name{EpiBuffer-package}
+\alias{EpiBuffer-package}
+\alias{EpiBuffer}
 \docType{package}
 \title{
-\packageTitle{SpBuffer}
+\packageTitle{EpiBuffer}
 }
 \description{
-\packageDescription{SpBuffer}
+\packageDescription{EpiBuffer}
 }
 \details{
 
 The DESCRIPTION file:
-\packageDESCRIPTION{SpBuffer}
-\packageIndices{SpBuffer}
+\packageDESCRIPTION{EpiBuffer}
+\packageIndices{EpiBuffer}
 ~~ An overview of how to use the package, including the most important functions ~~
 }
 \author{
-\packageAuthor{SpBuffer}
+\packageAuthor{EpiBuffer}
 
-Maintainer: \packageMaintainer{SpBuffer}
+Maintainer: \packageMaintainer{EpiBuffer}
 }
 \references{
 ~~ Literature or other references for background information ~~

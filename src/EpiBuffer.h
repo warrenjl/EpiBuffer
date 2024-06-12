@@ -78,7 +78,7 @@ Rcpp::List theta_single_update(arma::mat x,
                                double sigma2_theta_old,
                                double rho_theta_old,
                                arma::mat theta_corr_inv,
-                               arma::uvec radius_pointer_old, 
+                               arma::uvec radius_pointer_uvec_old, 
                                arma::mat Z);
 
 Rcpp::List theta_update(arma::mat x, 
@@ -94,19 +94,6 @@ Rcpp::List theta_update(arma::mat x,
                         arma::mat theta_corr_inv,
                         arma::mat G,
                         arma::mat Z);
-
-Rcpp::List theta_single_update(arma::mat x, 
-                               arma::vec off_set,
-                               int n_ind,
-                               int m,
-                               arma::vec omega,
-                               arma::vec lambda,
-                               arma::vec beta,
-                               double sigma2_theta_old,
-                               double rho_theta_old,
-                               arma::mat theta_corr_inv,
-                               double radius_pointer_old, 
-                               arma::mat Z);
 
 double sigma2_theta_update(int m,
                            double a_sigma2_theta,
@@ -164,7 +151,6 @@ Rcpp::List radius_update(arma::vec y,
                          double sigma2_epsilon,
                          arma::vec beta, 
                          arma::vec theta,
-                         arma::vec radius,
                          arma::mat Z,
                          arma::vec theta_keep);
 
@@ -237,7 +223,6 @@ Rcpp::List rho_phi_update(arma::mat x,
                           int acctot_rho_phi);
 
 Rcpp::List SingleBuffer(int mcmc_samples,
-                        arma::vec y,
                         arma::mat x,
                         arma::vec radius_seq,
                         arma::mat exposure,

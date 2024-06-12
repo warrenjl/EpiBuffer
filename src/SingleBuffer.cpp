@@ -43,8 +43,8 @@ arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
 arma::mat theta(m, mcmc_samples); theta.fill(0.00);
 arma::vec sigma2_theta(mcmc_samples); sigma2_theta.fill(0.00);
 arma::vec rho_theta(mcmc_samples); rho_theta.fill(0.00);
-arma::vec radius(mcmc_samples); radius.fill(0.00);
-arma::vec theta_keep(mcmc_samples); theta_keep.fill(0.00);
+arma::mat radius(1, mcmc_samples); radius.fill(0.00);
+arma::mat theta_keep(1, mcmc_samples); theta_keep.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
@@ -143,8 +143,8 @@ if(radius_pointer_init.isNotNull()){
   }
 arma::uvec radius_pointer_uvec = arma::conv_to<arma::uvec>::from(radius_pointer);
 radius.col(0) = radius_seq.elem(radius_pointer_uvec - 1);
-arma::mat Z(n_ind, 1); Z.fill(0.00);
-Z.col(0) = exposure.cols(radius_pointer_uvec - 1);
+arma::mat Z(n_ind, m); Z.fill(0.00);
+Z.cols(radius_pointer_uvec - 1) = exposure.cols(radius_pointer_uvec - 1);
 theta_keep.col(0) = theta(0, (radius_pointer(0) - 1));
 
 neg_two_loglike(0) = neg_two_loglike_update(y,
@@ -157,7 +157,7 @@ neg_two_loglike(0) = neg_two_loglike_update(y,
                                             sigma2_epsilon(0),
                                             beta.col(0),
                                             theta_keep.col(0),
-                                            Z);
+                                            Z.cols(radius_pointer_uvec - 1));
 
 //Metropolis Settings
 int acctot_rho_theta = 0;
@@ -176,7 +176,7 @@ if(likelihood_indicator == 2){
                                            r(0),
                                            beta.col(0),
                                            theta_keep.col(0),
-                                           Z);
+                                           Z.cols(radius_pointer_uvec - 1));
   omega = Rcpp::as<arma::vec>(latent_output[0]);
   lambda = Rcpp::as<arma::vec>(latent_output[1]);
   
@@ -195,7 +195,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                b_sigma2_epsilon,
                                                beta.col(j-1),
                                                theta_keep.col(j-1),
-                                               Z);
+                                               Z.cols(radius_pointer_uvec - 1));
      omega.fill(1.00/sigma2_epsilon(j));
      
      }
@@ -212,7 +212,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               r(j-1),
                                               beta.col(j-1),
                                               theta_keep.col(j-1),
-                                              Z);
+                                              Z.cols(radius_pointer_uvec - 1));
      omega = Rcpp::as<arma::vec>(latent_output[0]);
      lambda = Rcpp::as<arma::vec>(latent_output[1]);
      
@@ -227,7 +227,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                              omega,
                              lambda,
                              theta_keep.col(j-1),
-                             Z);
+                             Z.cols(radius_pointer_uvec - 1));
    
    //theta, theta_keep Update
    Rcpp::List theta_output = theta_single_update(x, 
@@ -240,12 +240,12 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                  sigma2_theta(j-1),
                                                  rho_theta(j-1),
                                                  theta_corr_info[0],
-                                                 radius_pointer,
+                                                 radius_pointer_uvec,
                                                  Z);
    theta.col(j) = Rcpp::as<arma::vec>(theta_output[0]);
    theta_keep.col(j) = Rcpp::as<arma::vec>(theta_output[1]);
    
-   //sigma2_theta Updates
+   //sigma2_theta Update
    sigma2_theta(j) = sigma2_theta_update(m,
                                          a_sigma2_theta,
                                          b_sigma2_theta,
@@ -281,13 +281,13 @@ for(int j = 1; j < mcmc_samples; ++j){
                                             sigma2_epsilon(j),
                                             beta.col(j), 
                                             theta.col(j),
-                                            radius(j),
                                             Z,
-                                            theta_keep.col(0));
-   radius_pointer(0) = Rcpp::as<arma::double>(radius_output[0]);
-   radius(j) = Rcpp::as<arma::double>(radius_output[1]);
-   Z.col(0) = Rcpp::as<arma::vec>(radius_output[2]);
-   theta_keep.col(j) = Rcpp::as<arma::vec>(radius_output[3]);
+                                            theta_keep.col(j));
+   radius_pointer(0) = Rcpp::as<double>(radius_output[0]);
+   radius_pointer_uvec = Rcpp::as<arma::uvec>(radius_output[1]);
+   radius(j) = Rcpp::as<double>(radius_output[2]);
+   Z = Rcpp::as<arma::mat>(radius_output[3]);
+   theta_keep.col(j) = Rcpp::as<arma::vec>(radius_output[4]);
    
    if(likelihood_indicator == 2){
      
@@ -300,7 +300,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                      b_r,
                      beta.col(j),
                      theta_keep.col(j),
-                     Z);
+                     Z.cols(radius_pointer_uvec - 1));
      
      //latent parameters Update
      Rcpp::List latent_output = latent_update(y,
@@ -312,7 +312,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               r(j),
                                               beta.col(j),
                                               theta_keep.col(j),
-                                              Z);
+                                              Z.cols(radius_pointer_uvec - 1));
      omega = Rcpp::as<arma::vec>(latent_output[0]);
      lambda = Rcpp::as<arma::vec>(latent_output[1]);
      
@@ -329,7 +329,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                sigma2_epsilon(j),
                                                beta.col(j),
                                                theta_keep.col(j),
-                                               Z);
+                                               Z.cols(radius_pointer_uvec - 1));
   
    //Progress
    if((j + 1) % 10 == 0){ 
@@ -344,7 +344,7 @@ for(int j = 1; j < mcmc_samples; ++j){
      double accrate_rho_theta = round(100*(acctot_rho_theta/(double)j));
      Rcpp::Rcout << "rho_theta Acceptance: " << accrate_rho_theta << "%" << std::endl;
      
-     Rcpp::Rcout << "******************************" << std::endl;
+     Rcpp::Rcout << "*************************" << std::endl;
     
      }
    

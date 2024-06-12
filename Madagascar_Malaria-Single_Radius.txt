@@ -198,17 +198,12 @@ full_dists<-rdist(rbind(ind_locs,
 diag(full_dists)<-0.00
 full_dists<-full_dists/10.00
 
-results<-SpBuffer(mcmc_samples = 10000,
+results<-SingleBuffer(mcmc_samples = 1000,
                   y = y,
                   x = x,
                   radius_seq = radius_seq,
                   exposure = model_exposure,
-                  w = w,
-                  full_dists = full_dists,
                   metrop_var_rho_theta = 1.50^2,
-                  metrop_var_gamma = rep(0.10^2, times = ncol(w)),
-                  metrop_var_phi_star = rep(0.03^2, times = n_grid),
-                  metrop_var_rho_phi = 0.50^2,
                   likelihood_indicator = 1)
 
 
