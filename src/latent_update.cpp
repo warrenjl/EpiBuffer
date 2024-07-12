@@ -31,7 +31,7 @@ if(likelihood_indicator == 0){
     
   omega = rcpp_pgdraw(input0,
                       mean_omega);
-  lambda = (y - 0.50)/omega;
+  lambda = (y - 0.50*tri_als)/omega;
     
   } 
   
