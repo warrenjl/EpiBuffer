@@ -5,8 +5,8 @@ SingleBuffer <- function(mcmc_samples, y, x, radius_seq, exposure, metrop_var_rh
     .Call(`_EpiBuffer_SingleBuffer`, mcmc_samples, y, x, radius_seq, exposure, metrop_var_rho_theta, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, a_sigma2_theta_prior, b_sigma2_theta_prior, l_rho_theta_prior, u_rho_theta_prior, r_init, sigma2_epsilon_init, beta_init, theta_keep_init, sigma2_theta_init, rho_theta_init, radius_pointer_init)
 }
 
-SpatialBuffers <- function(mcmc_samples, y, x, radius_seq, exposure, w, full_dists, metrop_var_rho_theta, metrop_var_gamma, metrop_var_phi_star, metrop_var_rho_phi, likelihood_indicator, offset = NULL, trials = NULL, a_r_prior = NULL, b_r_prior = NULL, a_sigma2_epsilon_prior = NULL, b_sigma2_epsilon_prior = NULL, sigma2_beta_prior = NULL, a_sigma2_theta_prior = NULL, b_sigma2_theta_prior = NULL, l_rho_theta_prior = NULL, u_rho_theta_prior = NULL, sigma2_gamma_prior = NULL, a_sigma2_phi_prior = NULL, b_sigma2_phi_prior = NULL, a_rho_phi_prior = NULL, b_rho_phi_prior = NULL, r_init = NULL, sigma2_epsilon_init = NULL, beta_init = NULL, theta_keep_init = NULL, sigma2_theta_init = NULL, rho_theta_init = NULL, gamma_init = NULL, sigma2_phi_init = NULL, rho_phi_init = NULL) {
-    .Call(`_EpiBuffer_SpatialBuffers`, mcmc_samples, y, x, radius_seq, exposure, w, full_dists, metrop_var_rho_theta, metrop_var_gamma, metrop_var_phi_star, metrop_var_rho_phi, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, a_sigma2_theta_prior, b_sigma2_theta_prior, l_rho_theta_prior, u_rho_theta_prior, sigma2_gamma_prior, a_sigma2_phi_prior, b_sigma2_phi_prior, a_rho_phi_prior, b_rho_phi_prior, r_init, sigma2_epsilon_init, beta_init, theta_keep_init, sigma2_theta_init, rho_theta_init, gamma_init, sigma2_phi_init, rho_phi_init)
+SpatialBuffers <- function(mcmc_samples, y, x, radius_seq, exposure, w, full_dists, metrop_var_rho_theta, metrop_var_gamma, metrop_var_phi_star, metrop_delta_sigma_phi, metrop_var_rho_phi, likelihood_indicator, offset = NULL, trials = NULL, a_r_prior = NULL, b_r_prior = NULL, a_sigma2_epsilon_prior = NULL, b_sigma2_epsilon_prior = NULL, sigma2_beta_prior = NULL, a_sigma2_theta_prior = NULL, b_sigma2_theta_prior = NULL, l_rho_theta_prior = NULL, u_rho_theta_prior = NULL, sigma2_gamma_prior = NULL, b_sigma2_phi_prior = NULL, a_rho_phi_prior = NULL, b_rho_phi_prior = NULL, r_init = NULL, sigma2_epsilon_init = NULL, beta_init = NULL, theta_keep_init = NULL, sigma2_theta_init = NULL, rho_theta_init = NULL, gamma_init = NULL, sigma2_phi_init = NULL, rho_phi_init = NULL) {
+    .Call(`_EpiBuffer_SpatialBuffers`, mcmc_samples, y, x, radius_seq, exposure, w, full_dists, metrop_var_rho_theta, metrop_var_gamma, metrop_var_phi_star, metrop_delta_sigma_phi, metrop_var_rho_phi, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, a_sigma2_theta_prior, b_sigma2_theta_prior, l_rho_theta_prior, u_rho_theta_prior, sigma2_gamma_prior, b_sigma2_phi_prior, a_rho_phi_prior, b_rho_phi_prior, r_init, sigma2_epsilon_init, beta_init, theta_keep_init, sigma2_theta_init, rho_theta_init, gamma_init, sigma2_phi_init, rho_phi_init)
 }
 
 beta_update <- function(x, off_set, n_ind, p_x, sigma2_beta, omega, lambda, theta_keep_old, Z) {
@@ -45,16 +45,16 @@ rho_phi_update <- function(x, radius_seq, exposure, off_set, w, n_ind, m, dists1
     .Call(`_EpiBuffer_rho_phi_update`, x, radius_seq, exposure, off_set, w, n_ind, m, dists12, dists22, one_vec, a_rho_phi, b_rho_phi, omega, lambda, beta, theta, gamma, phi_star, sigma2_phi, rho_phi_old, phi_star_corr_info, C, phi_tilde, delta_star_trans, delta_star, radius_pointer, G, radius, Z, theta_keep, metrop_var_rho_phi, acctot_rho_phi)
 }
 
-rho_theta_update <- function(m, l_rho_theta, u_rho_theta, theta, sigma2_theta, rho_theta_old, theta_corr_info, metrop_var_rho_theta, acctot_rho_theta_trans) {
-    .Call(`_EpiBuffer_rho_theta_update`, m, l_rho_theta, u_rho_theta, theta, sigma2_theta, rho_theta_old, theta_corr_info, metrop_var_rho_theta, acctot_rho_theta_trans)
+rho_theta_update <- function(m, l_rho_theta, u_rho_theta, theta, sigma2_theta, rho_theta_old, theta_corr_info, metrop_var_rho_theta, acctot_rho_theta) {
+    .Call(`_EpiBuffer_rho_theta_update`, m, l_rho_theta, u_rho_theta, theta, sigma2_theta, rho_theta_old, theta_corr_info, metrop_var_rho_theta, acctot_rho_theta)
 }
 
 sigma2_epsilon_update <- function(y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta_old, theta_keep_old, Z) {
     .Call(`_EpiBuffer_sigma2_epsilon_update`, y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta_old, theta_keep_old, Z)
 }
 
-sigma2_phi_update <- function(n_grid, a_sigma2_phi, b_sigma2_phi, phi_star, phi_star_corr_inv) {
-    .Call(`_EpiBuffer_sigma2_phi_update`, n_grid, a_sigma2_phi, b_sigma2_phi, phi_star, phi_star_corr_inv)
+sigma2_phi_update <- function(n_grid, b_sigma2_phi, phi_star, sigma2_phi_old, phi_star_corr_inv, metrop_delta_sigma_phi, acctot_sigma_phi) {
+    .Call(`_EpiBuffer_sigma2_phi_update`, n_grid, b_sigma2_phi, phi_star, sigma2_phi_old, phi_star_corr_inv, metrop_delta_sigma_phi, acctot_sigma_phi)
 }
 
 sigma2_theta_update <- function(m, a_sigma2_theta, b_sigma2_theta, theta, rho_theta_old, theta_corr_inv) {

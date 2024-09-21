@@ -14,7 +14,7 @@ Rcpp::List rho_theta_update(int m,
                             double rho_theta_old,
                             Rcpp::List theta_corr_info,
                             double metrop_var_rho_theta,
-                            int acctot_rho_theta_trans){
+                            int acctot_rho_theta){
 
 /*Second*/
 Rcpp::List theta_corr_info_old = theta_corr_info;
@@ -53,11 +53,11 @@ if(ratio < R::runif(0.00, 1.00)){
   acc = 0;
   
   }
-acctot_rho_theta_trans = acctot_rho_theta_trans + 
-                         acc;
+acctot_rho_theta = acctot_rho_theta + 
+                   acc;
 
 return Rcpp::List::create(Rcpp::Named("rho_theta") = rho_theta,
-                          Rcpp::Named("acctot_rho_theta_trans") = acctot_rho_theta_trans,
+                          Rcpp::Named("acctot_rho_theta") = acctot_rho_theta,
                           Rcpp::Named("theta_corr_info") = theta_corr_info);
 
 }

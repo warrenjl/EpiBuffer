@@ -110,7 +110,7 @@ Rcpp::List rho_theta_update(int m,
                             double rho_theta_old,
                             Rcpp::List theta_corr_info,
                             double metrop_var_rho_theta,
-                            int acctot_rho_theta_trans);
+                            int acctot_rho_theta);
 
 Rcpp::List gamma_update(arma::mat x,
                         arma::vec radius_seq,
@@ -183,11 +183,13 @@ Rcpp::List phi_star_update(arma::mat x,
                            arma::vec metrop_var_phi_star,
                            arma::vec acctot_phi_star);
 
-double sigma2_phi_update(int n_grid,
-                         double a_sigma2_phi,
-                         double b_sigma2_phi,
-                         arma::vec phi_star,
-                         arma::mat phi_star_corr_inv);
+Rcpp::List sigma2_phi_update(int n_grid,
+                             double b_sigma2_phi,
+                             arma::vec phi_star,
+                             double sigma2_phi_old,
+                             arma::mat phi_star_corr_inv,
+                             double metrop_delta_sigma_phi,
+                             int acctot_sigma_phi);
 
 Rcpp::List rho_phi_update(arma::mat x,
                           arma::vec radius_seq,
@@ -257,6 +259,7 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           double metrop_var_rho_theta,
                           arma::vec metrop_var_gamma,
                           arma::vec metrop_var_phi_star,
+                          double metrop_delta_sigma_phi,
                           double metrop_var_rho_phi,
                           int likelihood_indicator,
                           Rcpp::Nullable<Rcpp::NumericVector> offset,
@@ -271,7 +274,6 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           Rcpp::Nullable<double> l_rho_theta_prior,
                           Rcpp::Nullable<double> u_rho_theta_prior,
                           Rcpp::Nullable<double> sigma2_gamma_prior,
-                          Rcpp::Nullable<double> a_sigma2_phi_prior,
                           Rcpp::Nullable<double> b_sigma2_phi_prior,
                           Rcpp::Nullable<double> a_rho_phi_prior,
                           Rcpp::Nullable<double> b_rho_phi_prior,
