@@ -16,7 +16,6 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           double metrop_var_rho_theta,
                           arma::vec metrop_var_gamma,
                           arma::vec metrop_var_phi_star,
-                          double metrop_delta_sigma_phi,
                           double metrop_var_rho_phi,
                           int likelihood_indicator,
                           Rcpp::Nullable<Rcpp::NumericVector> offset = R_NilValue,
@@ -31,7 +30,6 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           Rcpp::Nullable<double> l_rho_theta_prior = R_NilValue,
                           Rcpp::Nullable<double> u_rho_theta_prior = R_NilValue,
                           Rcpp::Nullable<double> sigma2_gamma_prior = R_NilValue,
-                          Rcpp::Nullable<double> b_sigma2_phi_prior = R_NilValue,
                           Rcpp::Nullable<double> a_rho_phi_prior = R_NilValue,
                           Rcpp::Nullable<double> b_rho_phi_prior = R_NilValue,
                           Rcpp::Nullable<double> r_init = R_NilValue,
@@ -41,7 +39,6 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           Rcpp::Nullable<double> sigma2_theta_init = R_NilValue,
                           Rcpp::Nullable<double> rho_theta_init = R_NilValue,
                           Rcpp::Nullable<Rcpp::NumericVector> gamma_init = R_NilValue,
-                          Rcpp::Nullable<double> sigma2_phi_init = R_NilValue,
                           Rcpp::Nullable<double> rho_phi_init = R_NilValue){
   
 //Defining Parameters and Quantities of Interest
@@ -62,7 +59,6 @@ arma::mat theta(m, mcmc_samples); theta.fill(0.00);
 arma::vec sigma2_theta(mcmc_samples); sigma2_theta.fill(0.00);
 arma::vec rho_theta(mcmc_samples); rho_theta.fill(0.00);
 arma::mat gamma(p_w, mcmc_samples); gamma.fill(0.00);
-arma::vec sigma2_phi(mcmc_samples); sigma2_phi.fill(0.00);
 arma::vec rho_phi(mcmc_samples); rho_phi.fill(0.00);
 arma::mat radius(n_ind, mcmc_samples); radius.fill(0.00);
 arma::mat theta_keep(1, mcmc_samples); theta_keep.fill(0.00);
@@ -124,14 +120,9 @@ if(u_rho_theta_prior.isNotNull()){
   u_rho_theta = Rcpp::as<double>(u_rho_theta_prior);
   }
 
-double sigma2_gamma = pow(datum::pi, 2)/3.00;
+double sigma2_gamma = 1.00;
 if(sigma2_gamma_prior.isNotNull()){
   sigma2_gamma = Rcpp::as<double>(sigma2_gamma_prior);
-  }
-
-double b_sigma2_phi = pow(datum::pi, 2)/3.00;
-if(b_sigma2_phi_prior.isNotNull()){
-  b_sigma2_phi = Rcpp::as<double>(b_sigma2_phi_prior);
   }
 
 double a_rho_phi = 1.00;
@@ -183,11 +174,6 @@ if(gamma_init.isNotNull()){
   gamma.col(0) = Rcpp::as<arma::vec>(gamma_init);
   }
 
-sigma2_phi(0) = 0.01;
-if(sigma2_phi_init.isNotNull()){
-  sigma2_phi(0) = Rcpp::as<double>(sigma2_phi_init);
-  }
-
 rho_phi(0) = 0.50;
 if(rho_phi_init.isNotNull()){
   rho_phi(0) = Rcpp::as<double>(rho_phi_init);
@@ -202,7 +188,14 @@ arma::mat C = exp(-rho_phi(0)*dists12);
 arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(spatial_corr_info[0])*phi_star);
 arma::vec delta_star_trans = w*gamma.col(0) +
                              phi_tilde;
-arma::vec delta_star = 1.00/(1.00 + exp(-delta_star_trans));
+Rcpp::NumericVector delta_star_trans_nv = Rcpp::NumericVector(delta_star_trans.begin(), 
+                                                              delta_star_trans.end());
+Rcpp::NumericVector delta_star_nv = Rcpp::pnorm(delta_star_trans_nv,
+                                                0.00,
+                                                1.00,
+                                                true,
+                                                false);
+arma::vec delta_star = arma::vec(Rcpp::as<std::vector<double>>(delta_star_nv));
 arma::vec radius_pointer = ceil(delta_star*m);
 arma::uvec lt1 = find(radius_pointer < 1);
 radius_pointer.elem(lt1).fill(1);
@@ -241,7 +234,6 @@ neg_two_loglike(0) = neg_two_loglike_update(y,
 int acctot_rho_theta = 0;
 arma::vec acctot_gamma(p_w); acctot_gamma.fill(0);
 arma::vec acctot_phi_star(n_grid); acctot_phi_star.fill(0);
-int acctot_sigma_phi = 0;
 int acctot_rho_phi = 0;
 
 //Main Sampling Loop
@@ -403,7 +395,6 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 theta.col(j),
                                                 gamma.col(j),
                                                 phi_star,
-                                                sigma2_phi(j-1),
                                                 spatial_corr_info[0],
                                                 C,
                                                 phi_tilde,
@@ -428,18 +419,6 @@ for(int j = 1; j < mcmc_samples; ++j){
    Z = Rcpp::as<arma::mat>(phi_star_output[8]);
    theta_keep.col(j) = Rcpp::as<arma::vec>(phi_star_output[9]);
    
-   //sigma2_phi Update
-   Rcpp::List sigma2_phi_output = sigma2_phi_update(n_grid,
-                                                    b_sigma2_phi,
-                                                    phi_star,
-                                                    sigma2_phi(j-1),
-                                                    spatial_corr_info[0],
-                                                    metrop_delta_sigma_phi,
-                                                    acctot_sigma_phi);
-   
-   sigma2_phi(j) = Rcpp::as<double>(sigma2_phi_output[0]);
-   acctot_sigma_phi = Rcpp::as<int>(sigma2_phi_output[1]);
-   
    //rho_phi Update
    Rcpp::List rho_phi_output = rho_phi_update(x,
                                               radius_seq,
@@ -459,7 +438,6 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               theta.col(j),
                                               gamma.col(j),
                                               phi_star,
-                                              sigma2_phi(j),
                                               rho_phi(j-1),
                                               spatial_corr_info,
                                               C,
@@ -554,9 +532,6 @@ for(int j = 1; j < mcmc_samples; ++j){
      double accrate_phi_star_max = round(100*(max(acctot_phi_star)/(double)j));
      Rcpp::Rcout << "phi_star Acceptance (max): " << accrate_phi_star_max << "%" << std::endl;
      
-     double accrate_sigma_phi = round(100*(acctot_sigma_phi/(double)j));
-     Rcpp::Rcout << "sigma_phi Acceptance: " << accrate_sigma_phi << "%" << std::endl;
-     
      double accrate_rho_phi = round(100*(acctot_rho_phi/(double)j));
      Rcpp::Rcout << "rho_phi Acceptance: " << accrate_rho_phi << "%" << std::endl;
      
@@ -573,7 +548,6 @@ return Rcpp::List::create(Rcpp::Named("r") = r,
                           Rcpp::Named("sigma2_theta") = sigma2_theta,
                           Rcpp::Named("rho_theta") = rho_theta,
                           Rcpp::Named("gamma") = gamma,
-                          Rcpp::Named("sigma2_phi") = sigma2_phi,
                           Rcpp::Named("rho_phi") = rho_phi,
                           Rcpp::Named("radius") = radius,
                           Rcpp::Named("theta_keep") = theta_keep,

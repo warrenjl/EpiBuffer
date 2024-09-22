@@ -24,7 +24,6 @@ Rcpp::List rho_phi_update(arma::mat x,
                           arma::vec theta,
                           arma::vec gamma,
                           arma::vec phi_star,
-                          double sigma2_phi,
                           double rho_phi_old,
                           Rcpp::List phi_star_corr_info,
                           arma::mat C,
@@ -56,7 +55,7 @@ arma::vec theta_keep_old = theta_keep;
   
 double denom = -0.50*dot((lambda - off_set - x*beta - Z_old*theta_keep_old), (omega%(lambda - off_set - x*beta - Z_old*theta_keep_old))) +
                0.50*phi_star_log_deter_corr_inv_old + 
-               -0.50*dot(phi_star, (phi_star_corr_inv_old*phi_star))/sigma2_phi +
+               -0.50*dot(phi_star, (phi_star_corr_inv_old*phi_star)) +
                a_rho_phi*rho_phi_trans_old +
                -b_rho_phi*exp(rho_phi_trans_old);
 
@@ -74,7 +73,14 @@ C = exp(-rho_phi*dists12);
 phi_tilde = C*(phi_star_corr_inv*phi_star);
 delta_star_trans = w*gamma +
                    phi_tilde;
-delta_star = 1.00/(1.00 + exp(-delta_star_trans));
+Rcpp::NumericVector delta_star_trans_nv = Rcpp::NumericVector(delta_star_trans.begin(), 
+                                                              delta_star_trans.end());
+Rcpp::NumericVector delta_star_nv = Rcpp::pnorm(delta_star_trans_nv,
+                                                0.00,
+                                                1.00,
+                                                true,
+                                                false);
+delta_star = arma::vec(Rcpp::as<std::vector<double>>(delta_star_nv));
 radius_pointer = ceil(delta_star*m);
 arma::uvec lt1 = find(radius_pointer < 1);
 radius_pointer.elem(lt1).fill(1);
@@ -98,7 +104,7 @@ theta_keep = one_vec*(G*theta)/n_ind;
 
 double numer = -0.50*dot((lambda - off_set - x*beta - Z*theta_keep), (omega%(lambda - off_set - x*beta - Z*theta_keep))) +
                0.50*phi_star_log_deter_corr_inv + 
-               -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/sigma2_phi +
+               -0.50*dot(phi_star, (phi_star_corr_inv*phi_star)) +
                a_rho_phi*rho_phi_trans +
                -b_rho_phi*exp(rho_phi_trans);
 

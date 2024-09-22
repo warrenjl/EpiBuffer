@@ -58,7 +58,14 @@ for(int j = 0; j < p_w; ++j){
    //Start:  Previous Function
    delta_star_trans = w*gamma +
                       phi_tilde;
-   delta_star = 1.00/(1.00 + exp(-delta_star_trans));
+   Rcpp::NumericVector delta_star_trans_nv = Rcpp::NumericVector(delta_star_trans.begin(), 
+                                                                 delta_star_trans.end());
+   Rcpp::NumericVector delta_star_nv = Rcpp::pnorm(delta_star_trans_nv,
+                                                   0.00,
+                                                   1.00,
+                                                   true,
+                                                   false);
+   delta_star = arma::vec(Rcpp::as<std::vector<double>>(delta_star_nv));
    radius_pointer = ceil(delta_star*m);
    arma::uvec lt1 = find(radius_pointer < 1);
    radius_pointer.elem(lt1).fill(1);

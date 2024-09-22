@@ -21,7 +21,6 @@ Rcpp::List phi_star_update(arma::mat x,
                            arma::vec theta,
                            arma::vec gamma,
                            arma::vec phi_star_old,
-                           double sigma2_phi_old,
                            arma::mat phi_star_corr_inv,
                            arma::mat C,
                            arma::vec phi_tilde,
@@ -53,7 +52,7 @@ for(int j = 0; j < n_grid; ++j){
    arma::vec theta_keep_old = theta_keep;
   
    denom = -0.50*dot((lambda - off_set - x*beta - Z_old*theta_keep_old), (omega%(lambda - off_set - x*beta - Z_old*theta_keep_old))) +
-           -(0.50/sigma2_phi_old)*dot(phi_star, (phi_star_corr_inv*phi_star));
+           -0.50*dot(phi_star, (phi_star_corr_inv*phi_star));
    
    //First
    phi_star(j) = R::rnorm(phi_star_old(j),
@@ -63,7 +62,14 @@ for(int j = 0; j < n_grid; ++j){
    phi_tilde = C*(phi_star_corr_inv*phi_star);
    delta_star_trans = w*gamma +
                       phi_tilde;
-   delta_star = 1.00/(1.00 + exp(-delta_star_trans));
+   Rcpp::NumericVector delta_star_trans_nv = Rcpp::NumericVector(delta_star_trans.begin(), 
+                                                                 delta_star_trans.end());
+   Rcpp::NumericVector delta_star_nv = Rcpp::pnorm(delta_star_trans_nv,
+                                                   0.00,
+                                                   1.00,
+                                                   true,
+                                                   false);
+   delta_star = arma::vec(Rcpp::as<std::vector<double>>(delta_star_nv));
    radius_pointer = ceil(delta_star*m);
    arma::uvec lt1 = find(radius_pointer < 1);
    radius_pointer.elem(lt1).fill(1);
@@ -86,7 +92,7 @@ for(int j = 0; j < n_grid; ++j){
    //End:  Previous Function
    
    numer = -0.50*dot((lambda - off_set - x*beta - Z*theta_keep), (omega%(lambda - off_set - x*beta - Z*theta_keep))) +
-           -(0.50/sigma2_phi_old)*dot(phi_star, (phi_star_corr_inv*phi_star));
+           -0.50*dot(phi_star, (phi_star_corr_inv*phi_star));
            
    //Decision
    double ratio = exp(numer - denom);
