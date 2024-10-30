@@ -6,96 +6,116 @@ using namespace Rcpp;
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
 
-Rcpp::List radius_update(arma::vec y,
-                         arma::mat x,
-                         arma::vec radius_seq,
-                         arma::mat exposure,
-                         arma::vec off_set,
-                         arma::vec tri_als,
-                         int likelihood_indicator,
+Rcpp::List radius_update(arma::vec radius_range,
+                         int exposure_definition_indicator,
+                         arma::mat exposure_dists,
+                         int p_d,
                          int n_ind,
                          int m,
-                         int r_old,
-                         double sigma2_epsilon,
-                         arma::vec beta, 
-                         arma::vec theta,
+                         arma::mat x,
+                         arma::vec off_set,
+                         arma::vec omega,
+                         arma::vec lambda,
+                         arma::vec beta,
+                         arma::vec eta,
+                         double radius_trans_old,
+                         double radius_old,
+                         arma::vec poly,
+                         arma::vec exposure,
                          arma::mat Z,
-                         arma::vec theta_keep){
+                         arma::vec theta_keep,
+                         double metrop_var_radius,
+                         int acctot_radius){
 
-arma::vec radius_log_vec(n_ind); radius_log_vec.fill(0.00);
-arma::vec radius_log_val(m); radius_log_val.fill(0.00);
+/*Second*/
+arma::vec exposure_old = exposure;
+arma::mat Z_old = Z;
+arma::vec poly_old = poly;
+arma::vec theta_keep_old = theta_keep;
 
-for(int j = 0; j < m; ++j){
+double denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) + 
+               -radius_trans_old +
+               -2.00*log(1.00 + exp(-radius_trans_old));
 
-   arma::vec mu = off_set +
-                  x*beta + 
-                  exposure.col(j)*theta(j);
-  
-   if(likelihood_indicator == 0){
-    
-     arma::vec probs = exp(mu)/(1.00 + exp(mu));
-     for(int k = 0; k < n_ind; ++k){
-        radius_log_vec(k) = R::dbinom(y(k),
-                                      tri_als(k),
-                                      probs(k),
-                                      TRUE);
-        }
-     
-     }
-   
-   if(likelihood_indicator == 1){
-     for(int k = 0; k < n_ind; ++k){
-        radius_log_vec(k) = R::dnorm(y(k),
-                                     mu(k),
-                                     sqrt(sigma2_epsilon),
-                                     TRUE);
-        }
-     }
-   
-   if(likelihood_indicator == 2){
-     
-     arma::vec probs = exp(mu)/(1.00 + exp(mu));
-     for(int k = 0; k < n_ind; ++k){
-        radius_log_vec(k) = R::dnbinom(y(k), 
-                                       r_old, 
-                                       (1.00 - probs(k)),        
-                                       TRUE);
-        }
-     
-     }
-   
-   radius_log_val(j) = sum(radius_log_vec);
-    
+/*First*/
+double radius_trans = R::rnorm(radius_trans_old, 
+                               sqrt(metrop_var_radius));
+double radius = (radius_range(1)*exp(radius_trans) + radius_range(0))/(exp(radius_trans) + 1.00);
+arma::mat radius_mat(n_ind, m); radius_mat.fill(radius);
+for(int j = 0; j < (p_d + 1); ++j){
+   poly(j) = pow((radius - radius_range(0))/(radius_range(1) - radius_range(0)), j);
    }
 
-arma::vec radius_probs(m); radius_probs.fill(0.00);
-for(int j = 0; j < m; ++j){
-
-   radius_probs(j) = 1.00/sum(exp(radius_log_val - radius_log_val(j)));
-   if(arma::is_finite(radius_probs(j)) == 0){
-     radius_probs(j) = 0.00;  /*Computational Correction*/
-     }
-   
-   }
+//Cumulative Counts
+if(exposure_definition_indicator == 0){
   
-IntegerVector sample_set = seq(1, m);
-arma::vec radius_pointer(1);
-radius_pointer(0) = sampleRcpp(wrap(sample_set), 
-                               1, 
-                               TRUE, 
-                               wrap(radius_probs))(0);
-arma::uvec radius_pointer_uvec = arma::conv_to<arma::uvec>::from(radius_pointer);
-arma::vec radius = radius_seq.elem(radius_pointer_uvec - 1);
-Z.fill(0.00);
-Z.cols(radius_pointer_uvec - 1) = exposure.cols(radius_pointer_uvec - 1);
-theta_keep = theta.elem(radius_pointer_uvec - 1);
+  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  exposure = arma::sum(numeric_mat,
+                       1);
+  exposure = exposure/m;
+  
+  }
 
-return Rcpp::List::create(Rcpp::Named("radius_pointer") = radius_pointer,
-                          Rcpp::Named("radius_pointer_uvec") = radius_pointer_uvec,
-                          Rcpp::Named("radius") = radius,
+//Spherical
+if(exposure_definition_indicator == 1){
+  
+  arma::mat corrs = 1.00 +
+                    -1.50*(exposure_dists/radius_mat) +
+                    0.50*pow((exposure_dists/radius_mat), 3);
+  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  arma::mat prod = corrs%numeric_mat;
+  exposure = arma::sum(prod,
+                       1);
+  exposure = exposure/m;
+  
+  }
+
+//Presence/Absence
+if(exposure_definition_indicator == 2){
+  
+  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  exposure = arma::max(numeric_mat,
+                       1);
+  
+  }
+
+for(int j = 0; j < (p_d + 1); ++j){
+   Z.col(j) = exposure*poly(j);
+   }
+theta_keep = dot(poly, eta);
+
+double numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) + 
+               -radius_trans +
+               -2.00*log(1.00 + exp(-radius_trans));
+  
+/*Decision*/
+double ratio = exp(numer - denom);   
+double acc = 1;
+if(ratio < R::runif(0.00, 1.00)){
+  
+  radius_trans = radius_trans_old;
+  radius = radius_old;
+  poly = poly_old;
+  exposure = exposure_old;
+  Z = Z_old;
+  theta_keep = theta_keep_old;
+  acc = 0;
+  
+  }
+acctot_radius = acctot_radius + 
+                acc;
+
+return Rcpp::List::create(Rcpp::Named("radius") = radius,
+                          Rcpp::Named("acctot_radius") = acctot_radius,
+                          Rcpp::Named("radius_trans") = radius_trans,
+                          Rcpp::Named("poly") = poly,
+                          Rcpp::Named("exposure") = exposure,
                           Rcpp::Named("Z") = Z,
                           Rcpp::Named("theta_keep") = theta_keep);
-                          
+
 }
 
 

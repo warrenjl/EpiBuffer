@@ -14,12 +14,12 @@ Rcpp::List latent_update(arma::vec y,
                          int n_ind,
                          int r_old,
                          arma::vec beta_old,
-                         arma::vec theta_keep_old,
+                         arma::vec eta_old,
                          arma::mat Z){
 
 arma::vec mean_omega = off_set +
                        x*beta_old + 
-                       Z*theta_keep_old;
+                       Z*eta_old;
 
 arma::vec input0 = tri_als;
 arma::vec input2 = (r_old + y);

@@ -15,14 +15,14 @@ double neg_two_loglike_update(arma::vec y,
                               int r,
                               double sigma2_epsilon,
                               arma::vec beta,
-                              arma::vec theta_keep,
+                              arma::vec eta,
                               arma::mat Z){
 
 arma::vec dens(n_ind); dens.fill(0.00);
 
 arma::vec mu = off_set +
                x*beta + 
-               Z*theta_keep;
+               Z*eta;
 
 arma::vec prob(n_ind); prob.fill(0.00);
 

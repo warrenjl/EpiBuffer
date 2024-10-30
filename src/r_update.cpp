@@ -13,12 +13,12 @@ int r_update(arma::vec y,
              int a_r,
              int b_r,
              arma::vec beta,
-             arma::vec theta_keep,
+             arma::vec eta,
              arma::mat Z){
 
 arma::vec mu = off_set +
                x*beta +
-               Z*theta_keep;
+               Z*eta;
   
 arma::vec prob = 1.00/(1.00 + exp(-mu));
   

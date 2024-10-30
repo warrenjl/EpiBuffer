@@ -13,7 +13,7 @@ arma::vec beta_update(arma::mat x,
                       double sigma2_beta,
                       arma::vec omega,
                       arma::vec lambda,
-                      arma::vec theta_keep_old,
+                      arma::vec eta_old,
                       arma::mat Z){
 
 arma::mat omega_mat(n_ind, p_x);
@@ -26,7 +26,7 @@ arma::mat x_trans = trans(x);
 arma::mat cov_beta = inv_sympd(x_trans*(omega_mat%x) + 
                                (1.00/sigma2_beta)*eye(p_x, p_x));
 
-arma::vec mean_beta = cov_beta*(x_trans*(omega%(lambda - off_set - Z*theta_keep_old)));
+arma::vec mean_beta = cov_beta*(x_trans*(omega%(lambda - off_set - Z*eta_old)));
 
 arma::mat ind_norms = arma::randn(1, p_x);
 arma::vec beta = mean_beta + 

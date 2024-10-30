@@ -13,13 +13,13 @@ double sigma2_epsilon_update(arma::vec y,
                              double a_sigma2_epsilon,
                              double b_sigma2_epsilon,
                              arma::vec beta_old,
-                             arma::vec theta_keep_old,
+                             arma::vec eta_old,
                              arma::mat Z){
 
 double a_sigma2_epsilon_update = 0.50*n_ind + 
                                  a_sigma2_epsilon;
 
-double b_sigma2_epsilon_update = 0.50*dot((y - off_set - x*beta_old - Z*theta_keep_old), (y - off_set - x*beta_old - Z*theta_keep_old)) + 
+double b_sigma2_epsilon_update = 0.50*dot((y - off_set - x*beta_old - Z*eta_old), (y - off_set - x*beta_old - Z*eta_old)) + 
                                  b_sigma2_epsilon;
 
 double sigma2_epsilon = 1.00/R::rgamma(a_sigma2_epsilon_update,
