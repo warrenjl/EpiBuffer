@@ -12,26 +12,27 @@ Rcpp::List radius_update(arma::vec radius_range,
                          int p_d,
                          int n_ind,
                          int m,
+                         int m_max,
                          arma::mat x,
                          arma::vec off_set,
                          arma::vec omega,
                          arma::vec lambda,
                          arma::vec beta,
                          arma::vec eta,
-                         double radius_trans_old,
                          double radius_old,
+                         arma::vec theta,
+                         double radius_trans_old,
                          arma::vec poly,
                          arma::vec exposure,
                          arma::mat Z,
-                         arma::vec theta_keep,
                          double metrop_var_radius,
                          int acctot_radius){
 
 /*Second*/
+arma::vec poly_old = poly;
 arma::vec exposure_old = exposure;
 arma::mat Z_old = Z;
-arma::vec poly_old = poly;
-arma::vec theta_keep_old = theta_keep;
+arma::vec theta_old = theta;
 
 double denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) + 
                -radius_trans_old +
@@ -53,7 +54,7 @@ if(exposure_definition_indicator == 0){
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
-  exposure = exposure/m;
+  exposure = exposure/m_max;
   
   }
 
@@ -68,7 +69,7 @@ if(exposure_definition_indicator == 1){
   arma::mat prod = corrs%numeric_mat;
   exposure = arma::sum(prod,
                        1);
-  exposure = exposure/m;
+  exposure = exposure/m_max;
   
   }
 
@@ -85,7 +86,7 @@ if(exposure_definition_indicator == 2){
 for(int j = 0; j < (p_d + 1); ++j){
    Z.col(j) = exposure*poly(j);
    }
-theta_keep = dot(poly, eta);
+theta = dot(poly, eta);
 
 double numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) + 
                -radius_trans +
@@ -101,7 +102,7 @@ if(ratio < R::runif(0.00, 1.00)){
   poly = poly_old;
   exposure = exposure_old;
   Z = Z_old;
-  theta_keep = theta_keep_old;
+  theta = theta_old;
   acc = 0;
   
   }
@@ -110,11 +111,11 @@ acctot_radius = acctot_radius +
 
 return Rcpp::List::create(Rcpp::Named("radius") = radius,
                           Rcpp::Named("acctot_radius") = acctot_radius,
+                          Rcpp::Named("theta") = theta,
                           Rcpp::Named("radius_trans") = radius_trans,
                           Rcpp::Named("poly") = poly,
                           Rcpp::Named("exposure") = exposure,
-                          Rcpp::Named("Z") = Z,
-                          Rcpp::Named("theta_keep") = theta_keep);
+                          Rcpp::Named("Z") = Z);
 
 }
 

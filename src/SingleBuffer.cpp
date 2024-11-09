@@ -34,12 +34,12 @@ int n_ind = y.size();
 int p_x = x.n_cols;
 int m = exposure_dists.n_cols;
 
+arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
 arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
 arma::mat eta((p_d + 1), mcmc_samples); eta.fill(0.00);
 arma::vec radius(mcmc_samples); radius.fill(0.00);
-arma::mat theta_keep(1, mcmc_samples); theta_keep.fill(0.00);
-arma::vec r(mcmc_samples); r.fill(0.00);
+arma::mat theta(1, mcmc_samples); theta.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
@@ -115,16 +115,27 @@ arma::vec poly(p_d + 1); poly.fill(0.00);
 for(int j = 0; j < (p_d + 1); ++j){
    poly(j) = pow((radius(0) - radius_range(0))/(radius_range(1) - radius_range(0)), j);
    }
-theta_keep.col(0) = dot(poly, eta.col(0));
+theta.col(0) = dot(poly, eta.col(0));
+
+//Determine Max Possible Exposure
+arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
+arma::umat comparison_max = (exposure_dists < radius_max_mat);
+arma::mat numeric_max_mat = arma::conv_to<arma::mat>::from(comparison_max);
+arma::vec exposure_max = arma::sum(numeric_max_mat,
+                                   1);
+double m_max = max(exposure_max);
+if(exposure_definition_indicator == 2){
+  m_max = 1;  
+  }
 
 //Cumulative Counts
 if(exposure_definition_indicator == 0){
-
+  
   arma::umat comparison = (exposure_dists < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
-  exposure = exposure/m;
+  exposure = exposure/m_max;
 
   }
 
@@ -139,7 +150,7 @@ if(exposure_definition_indicator == 1){
   arma::mat prod = corrs%numeric_mat;
   exposure = arma::sum(prod,
                        1);
-  exposure = exposure/m;
+  exposure = exposure/m_max;
   
   }
 
@@ -250,7 +261,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                            lambda,
                            beta.col(j),
                            Z);
-   theta_keep.col(j) = dot(poly, eta.col(j));
+   theta.col(j) = dot(poly, eta.col(j));
    
    //radius Update
    Rcpp::List radius_output = radius_update(radius_range,
@@ -259,28 +270,29 @@ for(int j = 1; j < mcmc_samples; ++j){
                                             p_d,
                                             n_ind,
                                             m,
+                                            m_max,
                                             x,
                                             off_set,
                                             omega,
                                             lambda,
                                             beta.col(j),
                                             eta.col(j),
-                                            radius_trans,
                                             radius(j-1),
+                                            theta.col(j),
+                                            radius_trans,
                                             poly,
                                             exposure,
                                             Z,
-                                            theta_keep.col(j),
                                             metrop_var_radius,
                                             acctot_radius);
    
    radius(j) = Rcpp::as<double>(radius_output[0]);
    acctot_radius = Rcpp::as<int>(radius_output[1]);
-   radius_trans = Rcpp::as<double>(radius_output[2]);
-   poly = Rcpp::as<arma::vec>(radius_output[3]);
-   exposure = Rcpp::as<arma::vec>(radius_output[4]);
-   Z = Rcpp::as<arma::mat>(radius_output[5]);
-   theta_keep.col(j) = Rcpp::as<arma::vec>(radius_output[6]);
+   theta.col(j) = Rcpp::as<arma::vec>(radius_output[2]);
+   radius_trans = Rcpp::as<double>(radius_output[3]);
+   poly = Rcpp::as<arma::vec>(radius_output[4]);
+   exposure = Rcpp::as<arma::vec>(radius_output[5]);
+   Z = Rcpp::as<arma::mat>(radius_output[6]);
    
    if(likelihood_indicator == 2){
      
@@ -337,18 +349,19 @@ for(int j = 1; j < mcmc_samples; ++j){
      double accrate_radius = round(100*(acctot_radius/(double)j));
      Rcpp::Rcout << "radius Acceptance: " << accrate_radius << "%" << std::endl;
      
-     Rcpp::Rcout << "***********************" << std::endl;
+     Rcpp::Rcout << "**********************" << std::endl;
     
      }
    
    }
-                                  
-return Rcpp::List::create(Rcpp::Named("r") = r,
+
+return Rcpp::List::create(Rcpp::Named("theta_scale") = m_max,
+                          Rcpp::Named("r") = r,
                           Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
                           Rcpp::Named("beta") = beta,
                           Rcpp::Named("eta") = eta,
                           Rcpp::Named("radius") = radius,
-                          Rcpp::Named("theta_keep") = theta_keep,
+                          Rcpp::Named("theta") = theta,
                           Rcpp::Named("neg_two_loglike") = neg_two_loglike);
 
 }
