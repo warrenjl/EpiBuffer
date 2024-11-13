@@ -167,7 +167,7 @@ radius_nv = radius_nv*(radius_range(1) - radius_range(0)) +
 radius.col(0) = arma::vec(Rcpp::as<std::vector<double>>(radius_nv));
 arma::mat radius_mat(n_ind, m); radius_mat.fill(0.00);
 for(int j = 0; j < n_ind; ++ j){
-   radius_mat.row(j).fill(radius(0,j));
+   radius_mat.row(j).fill(radius(j,0));
    }
 
 arma::vec exposure(n_ind); exposure.fill(0.00);
