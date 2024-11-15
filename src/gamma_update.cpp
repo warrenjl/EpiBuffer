@@ -55,7 +55,7 @@ for(int j = 0; j < p_w; ++j){
    //First
    gamma(j) = R::rnorm(gamma_old(j),
                        sqrt(metrop_var_gamma(j)));
-   radius_trans = w*gamma +
+   radius_trans = (v*w)*gamma +
                   v*phi_tilde;
    Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                              radius_trans.end());
@@ -81,7 +81,7 @@ for(int j = 0; j < p_w; ++j){
    //Cumulative Counts
    if(exposure_definition_indicator == 0){
        
-     arma::umat comparison = (exposure_dists < radius_mat);
+     arma::umat comparison = ((v*exposure_dists) < radius_mat);
      arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
      exposure = arma::sum(numeric_mat,
                             1);
@@ -93,9 +93,9 @@ for(int j = 0; j < p_w; ++j){
    if(exposure_definition_indicator == 1){
        
      arma::mat corrs = 1.00 +
-                       -1.50*(exposure_dists/radius_mat) +
-                       0.50*pow((exposure_dists/radius_mat), 3);
-     arma::umat comparison = (exposure_dists < radius_mat);
+                       -1.50*((v*exposure_dists)/radius_mat) +
+                       0.50*pow(((v*exposure_dists)/radius_mat), 3);
+     arma::umat comparison = ((v*exposure_dists) < radius_mat);
      arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
      arma::mat prod = corrs%numeric_mat;
      exposure = arma::sum(prod,
@@ -107,7 +107,7 @@ for(int j = 0; j < p_w; ++j){
    //Presence/Absence
    if(exposure_definition_indicator == 2){
        
-     arma::umat comparison = (exposure_dists < radius_mat);
+     arma::umat comparison = ((v*exposure_dists) < radius_mat);
      arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
      exposure = arma::max(numeric_mat,
                           1);

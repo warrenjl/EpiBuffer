@@ -72,7 +72,7 @@ arma::mat phi_star_corr_inv = phi_star_corr_info[0];
 double phi_star_log_deter_corr_inv = phi_star_corr_info[1];
 C = exp(-rho_phi*dists12);
 phi_tilde = C*(phi_star_corr_inv*phi_star);
-radius_trans = w*gamma +
+radius_trans = (v*w)*gamma +
                v*phi_tilde;
 Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                           radius_trans.end());
@@ -98,7 +98,7 @@ theta = poly*eta;
 //Cumulative Counts
 if(exposure_definition_indicator == 0){
   
-  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::umat comparison = ((v*exposure_dists) < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
@@ -110,9 +110,9 @@ if(exposure_definition_indicator == 0){
 if(exposure_definition_indicator == 1){
   
   arma::mat corrs = 1.00 +
-                    -1.50*(exposure_dists/radius_mat) +
-                    0.50*pow((exposure_dists/radius_mat), 3);
-  arma::umat comparison = (exposure_dists < radius_mat);
+                    -1.50*((v*exposure_dists)/radius_mat) +
+                    0.50*pow(((v*exposure_dists)/radius_mat), 3);
+  arma::umat comparison = ((v*exposure_dists) < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   arma::mat prod = corrs%numeric_mat;
   exposure = arma::sum(prod,
@@ -124,7 +124,7 @@ if(exposure_definition_indicator == 1){
 //Presence/Absence
 if(exposure_definition_indicator == 2){
   
-  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::umat comparison = ((v*exposure_dists) < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::max(numeric_mat,
                        1);
