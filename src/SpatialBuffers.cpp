@@ -49,6 +49,8 @@ int n_grid = full_dists.n_rows -
 arma::mat dists22 = full_dists.submat(n_ind_unique, n_ind_unique, (n_ind_unique + n_grid - 1), (n_ind_unique + n_grid - 1));
 arma::mat dists12 = full_dists.submat(0, n_ind_unique, (n_ind_unique - 1), (n_ind_unique + n_grid - 1));
 double max_dist = dists22.max();
+arma::mat v_exposure_dists = v*exposure_dists; 
+arma::mat v_w = v*w;
 
 arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
@@ -152,7 +154,7 @@ Rcpp::List spatial_corr_info = spatial_corr_fun(rho_phi(0),
 arma::vec phi_star(n_grid); phi_star.fill(0.00);
 arma::mat C = exp(-rho_phi(0)*dists12);
 arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(spatial_corr_info[0])*phi_star);
-arma::vec radius_trans = (v*w)*gamma.col(0) +
+arma::vec radius_trans = (v_w)*gamma.col(0) +
                          v*phi_tilde;
 Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                           radius_trans.end());
@@ -179,7 +181,7 @@ theta.col(0) = poly*eta.col(0);
 
 //Determine Max Possible Exposure
 arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
-arma::umat comparison_max = ((v*exposure_dists) < radius_max_mat);
+arma::umat comparison_max = ((v_exposure_dists) < radius_max_mat);
 arma::mat numeric_max_mat = arma::conv_to<arma::mat>::from(comparison_max);
 arma::vec exposure_max = arma::sum(numeric_max_mat,
                                    1);
@@ -191,7 +193,7 @@ if(exposure_definition_indicator == 2){
 //Cumulative Counts
 if(exposure_definition_indicator == 0){
   
-  arma::umat comparison = ((v*exposure_dists) < radius_mat);
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
@@ -203,9 +205,9 @@ if(exposure_definition_indicator == 0){
 if(exposure_definition_indicator == 1){
   
   arma::mat corrs = 1.00 +
-                    -1.50*((v*exposure_dists)/radius_mat) +
-                    0.50*pow(((v*exposure_dists)/radius_mat), 3);
-  arma::umat comparison = ((v*exposure_dists) < radius_mat);
+                    -1.50*((v_exposure_dists)/radius_mat) +
+                    0.50*pow(((v_exposure_dists)/radius_mat), 3);
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   arma::mat prod = corrs%numeric_mat;
   exposure = arma::sum(prod,
@@ -217,7 +219,7 @@ if(exposure_definition_indicator == 1){
 //Presence/Absence
 if(exposure_definition_indicator == 2){
   
-  arma::umat comparison = ((v*exposure_dists) < radius_mat);
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::max(numeric_mat,
                        1);
@@ -328,14 +330,14 @@ for(int j = 1; j < mcmc_samples; ++j){
    //gamma update
    Rcpp::List gamma_output = gamma_update(radius_range,
                                           exposure_definition_indicator,
-                                          exposure_dists,
+                                          v_exposure_dists,
                                           p_d,
                                           n_ind,
                                           m,
                                           m_max,
                                           p_w,
                                           x,
-                                          w,
+                                          v_w,
                                           v,
                                           off_set,
                                           sigma2_gamma,
@@ -366,7 +368,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    //phi_star Update
    Rcpp::List phi_star_output = phi_star_update(radius_range,
                                                 exposure_definition_indicator,
-                                                exposure_dists,
+                                                v_exposure_dists,
                                                 p_d,
                                                 n_ind,
                                                 n_grid,
@@ -374,7 +376,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 m_max,
                                                 p_w,
                                                 x,
-                                                w,
+                                                v_w,
                                                 v,
                                                 off_set,
                                                 omega,
@@ -408,7 +410,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    //rho_phi Update
    Rcpp::List rho_phi_output = rho_phi_update(radius_range,
                                               exposure_definition_indicator,
-                                              exposure_dists,
+                                              v_exposure_dists,
                                               p_d,
                                               n_ind,
                                               n_grid,
@@ -416,7 +418,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               m_max,
                                               p_w,
                                               x,
-                                              w,
+                                              v_w,
                                               v,
                                               off_set,
                                               dists12,
