@@ -17,7 +17,7 @@ Rcpp::List rho_phi_update(arma::vec radius_range,
                           int p_w,
                           arma::mat x,
                           arma::mat v_w,
-                          arma::mat v,
+                          arma::vec v_index,
                           arma::vec off_set,
                           arma::mat dists12,
                           arma::mat dists22,
@@ -72,8 +72,12 @@ arma::mat phi_star_corr_inv = phi_star_corr_info[0];
 double phi_star_log_deter_corr_inv = phi_star_corr_info[1];
 C = exp(-rho_phi*dists12);
 phi_tilde = C*(phi_star_corr_inv*phi_star);
+arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
+for(int j = 0; j < n_ind; ++j){
+   phi_tilde_full(j) = phi_tilde(v_index(j) - 1);
+   }
 radius_trans = (v_w)*gamma +
-               v*phi_tilde;
+               phi_tilde_full;
 Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                           radius_trans.end());
 Rcpp::NumericVector radius_nv = Rcpp::pnorm(radius_trans_nv,

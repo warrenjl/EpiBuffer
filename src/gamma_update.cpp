@@ -16,7 +16,7 @@ Rcpp::List gamma_update(arma::vec radius_range,
                         int p_w,
                         arma::mat x,
                         arma::mat v_w,
-                        arma::mat v,
+                        arma::vec v_index,
                         arma::vec off_set,
                         double sigma2_gamma,
                         arma::vec omega,
@@ -55,8 +55,12 @@ for(int j = 0; j < p_w; ++j){
    //First
    gamma(j) = R::rnorm(gamma_old(j),
                        sqrt(metrop_var_gamma(j)));
+   arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
+   for(int k = 0; k < n_ind; ++k){
+      phi_tilde_full(k) = phi_tilde(v_index(k) - 1);
+      }
    radius_trans = (v_w)*gamma +
-                  v*phi_tilde;
+                  phi_tilde_full;
    Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                              radius_trans.end());
    Rcpp::NumericVector radius_nv = Rcpp::pnorm(radius_trans_nv,

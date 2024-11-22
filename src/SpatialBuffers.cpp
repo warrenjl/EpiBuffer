@@ -52,6 +52,18 @@ double max_dist = dists22.max();
 arma::mat v_exposure_dists = v*exposure_dists; 
 arma::mat v_w = v*w;
 
+arma::vec v_index(n_ind); v_index.fill(0);
+for(int j = 0; j < n_ind; ++j){
+  for(int k = 0; k < m; ++k){
+     if(v(j,k) == 1){
+       
+       v_index(j) = k;
+       break;
+       
+       }
+     }
+  }
+
 arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
 arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
@@ -154,8 +166,12 @@ Rcpp::List spatial_corr_info = spatial_corr_fun(rho_phi(0),
 arma::vec phi_star(n_grid); phi_star.fill(0.00);
 arma::mat C = exp(-rho_phi(0)*dists12);
 arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(spatial_corr_info[0])*phi_star);
+arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
+for(int j = 0; j < n_ind; ++j){
+   phi_tilde_full(j) = phi_tilde(v_index(j) - 1);
+   }
 arma::vec radius_trans = (v_w)*gamma.col(0) +
-                         v*phi_tilde;
+                         phi_tilde_full;
 Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                           radius_trans.end());
 Rcpp::NumericVector radius_nv = Rcpp::pnorm(radius_trans_nv,
@@ -338,7 +354,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           p_w,
                                           x,
                                           v_w,
-                                          v,
+                                          v_index,
                                           off_set,
                                           sigma2_gamma,
                                           omega,
@@ -377,7 +393,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 p_w,
                                                 x,
                                                 v_w,
-                                                v,
+                                                v_index,
                                                 off_set,
                                                 omega,
                                                 lambda,
@@ -419,7 +435,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               p_w,
                                               x,
                                               v_w,
-                                              v,
+                                              v_index,
                                               off_set,
                                               dists12,
                                               dists22,
