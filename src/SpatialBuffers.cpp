@@ -54,7 +54,7 @@ arma::mat v_w = v*w;
 
 arma::vec v_index(n_ind); v_index.fill(0);
 for(int j = 0; j < n_ind; ++j){
-  for(int k = 0; k < m; ++k){
+  for(int k = 0; k < n_ind_unique; ++k){
      if(v(j,k) == 1){
        
        v_index(j) = k;
@@ -168,10 +168,11 @@ arma::mat C = exp(-rho_phi(0)*dists12);
 arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(spatial_corr_info[0])*phi_star);
 arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
 for(int j = 0; j < n_ind; ++j){
-   phi_tilde_full(j) = phi_tilde(v_index(j) - 1);
+   phi_tilde_full(j) = phi_tilde(v_index(j));
    }
 arma::vec radius_trans = (v_w)*gamma.col(0) +
                          phi_tilde_full;
+
 Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                           radius_trans.end());
 Rcpp::NumericVector radius_nv = Rcpp::pnorm(radius_trans_nv,

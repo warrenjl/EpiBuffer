@@ -57,7 +57,7 @@ for(int j = 0; j < p_w; ++j){
                        sqrt(metrop_var_gamma(j)));
    arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
    for(int k = 0; k < n_ind; ++k){
-      phi_tilde_full(k) = phi_tilde(v_index(k) - 1);
+      phi_tilde_full(k) = phi_tilde(v_index(k));
       }
    radius_trans = (v_w)*gamma +
                   phi_tilde_full;

@@ -62,7 +62,7 @@ for(int j = 0; j < n_grid; ++j){
    phi_tilde = C*(phi_star_corr_inv*phi_star);
    arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
    for(int k = 0; k < n_ind; ++k){
-     phi_tilde_full(k) = phi_tilde(v_index(k) - 1);
+     phi_tilde_full(k) = phi_tilde(v_index(k));
      }
    radius_trans = (v_w)*gamma +
                   phi_tilde_full;

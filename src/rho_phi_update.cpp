@@ -74,7 +74,7 @@ C = exp(-rho_phi*dists12);
 phi_tilde = C*(phi_star_corr_inv*phi_star);
 arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
 for(int j = 0; j < n_ind; ++j){
-   phi_tilde_full(j) = phi_tilde(v_index(j) - 1);
+   phi_tilde_full(j) = phi_tilde(v_index(j));
    }
 radius_trans = (v_w)*gamma +
                phi_tilde_full;
