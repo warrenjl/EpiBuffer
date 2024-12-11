@@ -12,14 +12,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // SingleBuffer
-Rcpp::List SingleBuffer(int mcmc_samples, arma::vec y, arma::mat x, arma::vec radius_range, int exposure_definition_indicator, arma::mat exposure_dists, int p_d, double metrop_var_radius, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<Rcpp::NumericVector> trials, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_beta_prior, Rcpp::Nullable<double> sigma2_eta_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<Rcpp::NumericVector> eta_init, Rcpp::Nullable<double> radius_init);
-RcppExport SEXP _EpiBuffer_SingleBuffer(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP radius_rangeSEXP, SEXP exposure_definition_indicatorSEXP, SEXP exposure_distsSEXP, SEXP p_dSEXP, SEXP metrop_var_radiusSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP trialsSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_beta_priorSEXP, SEXP sigma2_eta_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP eta_initSEXP, SEXP radius_initSEXP) {
+Rcpp::List SingleBuffer(int mcmc_samples, arma::vec y, arma::mat x, arma::mat v, arma::vec radius_range, int exposure_definition_indicator, arma::mat exposure_dists, int p_d, double metrop_var_radius, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<Rcpp::NumericVector> trials, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_beta_prior, Rcpp::Nullable<double> sigma2_eta_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<Rcpp::NumericVector> eta_init, Rcpp::Nullable<double> radius_init);
+RcppExport SEXP _EpiBuffer_SingleBuffer(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP vSEXP, SEXP radius_rangeSEXP, SEXP exposure_definition_indicatorSEXP, SEXP exposure_distsSEXP, SEXP p_dSEXP, SEXP metrop_var_radiusSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP trialsSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_beta_priorSEXP, SEXP sigma2_eta_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP eta_initSEXP, SEXP radius_initSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type mcmc_samples(mcmc_samplesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type v(vSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type radius_range(radius_rangeSEXP);
     Rcpp::traits::input_parameter< int >::type exposure_definition_indicator(exposure_definition_indicatorSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type exposure_dists(exposure_distsSEXP);
@@ -39,7 +40,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type beta_init(beta_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type eta_init(eta_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type radius_init(radius_initSEXP);
-    rcpp_result_gen = Rcpp::wrap(SingleBuffer(mcmc_samples, y, x, radius_range, exposure_definition_indicator, exposure_dists, p_d, metrop_var_radius, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, sigma2_eta_prior, r_init, sigma2_epsilon_init, beta_init, eta_init, radius_init));
+    rcpp_result_gen = Rcpp::wrap(SingleBuffer(mcmc_samples, y, x, v, radius_range, exposure_definition_indicator, exposure_dists, p_d, metrop_var_radius, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, sigma2_eta_prior, r_init, sigma2_epsilon_init, beta_init, eta_init, radius_init));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -260,14 +261,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // radius_update
-Rcpp::List radius_update(arma::vec radius_range, int exposure_definition_indicator, arma::mat exposure_dists, int p_d, int n_ind, int m, int m_max, arma::mat x, arma::vec off_set, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec eta, double radius_old, arma::vec theta, double radius_trans_old, arma::vec poly, arma::vec exposure, arma::mat Z, double metrop_var_radius, int acctot_radius);
-RcppExport SEXP _EpiBuffer_radius_update(SEXP radius_rangeSEXP, SEXP exposure_definition_indicatorSEXP, SEXP exposure_distsSEXP, SEXP p_dSEXP, SEXP n_indSEXP, SEXP mSEXP, SEXP m_maxSEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP etaSEXP, SEXP radius_oldSEXP, SEXP thetaSEXP, SEXP radius_trans_oldSEXP, SEXP polySEXP, SEXP exposureSEXP, SEXP ZSEXP, SEXP metrop_var_radiusSEXP, SEXP acctot_radiusSEXP) {
+Rcpp::List radius_update(arma::vec radius_range, int exposure_definition_indicator, arma::mat v_exposure_dists, int p_d, int n_ind, int m, int m_max, arma::mat x, arma::vec off_set, arma::vec omega, arma::vec lambda, arma::vec beta, arma::vec eta, double radius_old, arma::vec theta, double radius_trans_old, arma::vec poly, arma::vec exposure, arma::mat Z, double metrop_var_radius, int acctot_radius);
+RcppExport SEXP _EpiBuffer_radius_update(SEXP radius_rangeSEXP, SEXP exposure_definition_indicatorSEXP, SEXP v_exposure_distsSEXP, SEXP p_dSEXP, SEXP n_indSEXP, SEXP mSEXP, SEXP m_maxSEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP omegaSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP etaSEXP, SEXP radius_oldSEXP, SEXP thetaSEXP, SEXP radius_trans_oldSEXP, SEXP polySEXP, SEXP exposureSEXP, SEXP ZSEXP, SEXP metrop_var_radiusSEXP, SEXP acctot_radiusSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type radius_range(radius_rangeSEXP);
     Rcpp::traits::input_parameter< int >::type exposure_definition_indicator(exposure_definition_indicatorSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type exposure_dists(exposure_distsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type v_exposure_dists(v_exposure_distsSEXP);
     Rcpp::traits::input_parameter< int >::type p_d(p_dSEXP);
     Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
@@ -286,7 +287,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP);
     Rcpp::traits::input_parameter< double >::type metrop_var_radius(metrop_var_radiusSEXP);
     Rcpp::traits::input_parameter< int >::type acctot_radius(acctot_radiusSEXP);
-    rcpp_result_gen = Rcpp::wrap(radius_update(radius_range, exposure_definition_indicator, exposure_dists, p_d, n_ind, m, m_max, x, off_set, omega, lambda, beta, eta, radius_old, theta, radius_trans_old, poly, exposure, Z, metrop_var_radius, acctot_radius));
+    rcpp_result_gen = Rcpp::wrap(radius_update(radius_range, exposure_definition_indicator, v_exposure_dists, p_d, n_ind, m, m_max, x, off_set, omega, lambda, beta, eta, radius_old, theta, radius_trans_old, poly, exposure, Z, metrop_var_radius, acctot_radius));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -380,7 +381,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_EpiBuffer_SingleBuffer", (DL_FUNC) &_EpiBuffer_SingleBuffer, 22},
+    {"_EpiBuffer_SingleBuffer", (DL_FUNC) &_EpiBuffer_SingleBuffer, 23},
     {"_EpiBuffer_SpatialBuffers", (DL_FUNC) &_EpiBuffer_SpatialBuffers, 31},
     {"_EpiBuffer_beta_update", (DL_FUNC) &_EpiBuffer_beta_update, 9},
     {"_EpiBuffer_eta_update", (DL_FUNC) &_EpiBuffer_eta_update, 9},

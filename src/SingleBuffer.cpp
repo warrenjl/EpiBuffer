@@ -9,6 +9,7 @@ using namespace Rcpp;
 Rcpp::List SingleBuffer(int mcmc_samples,
                         arma::vec y,
                         arma::mat x,
+                        arma::mat v,
                         arma::vec radius_range,
                         int exposure_definition_indicator,
                         arma::mat exposure_dists,
@@ -51,6 +52,8 @@ arma::vec tri_als(n_ind); tri_als.fill(1);
 if(trials.isNotNull()){
   tri_als = Rcpp::as<arma::vec>(trials);
   }
+
+arma::mat v_exposure_dists = v*exposure_dists; 
 
 //Prior Information
 int a_r = 1;
@@ -119,7 +122,7 @@ theta.col(0) = dot(poly, eta.col(0));
 
 //Determine Max Possible Exposure
 arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
-arma::umat comparison_max = (exposure_dists < radius_max_mat);
+arma::umat comparison_max = (v_exposure_dists < radius_max_mat);
 arma::mat numeric_max_mat = arma::conv_to<arma::mat>::from(comparison_max);
 arma::vec exposure_max = arma::sum(numeric_max_mat,
                                    1);
@@ -131,7 +134,7 @@ if(exposure_definition_indicator == 2){
 //Cumulative Counts
 if(exposure_definition_indicator == 0){
   
-  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::umat comparison = (v_exposure_dists < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
@@ -143,9 +146,9 @@ if(exposure_definition_indicator == 0){
 if(exposure_definition_indicator == 1){
   
   arma::mat corrs = 1.00 +
-                    -1.50*(exposure_dists/radius_mat) +
-                    0.50*pow((exposure_dists/radius_mat), 3);
-  arma::umat comparison = (exposure_dists < radius_mat);
+                    -1.50*(v_exposure_dists/radius_mat) +
+                    0.50*pow((v_exposure_dists/radius_mat), 3);
+  arma::umat comparison = (v_exposure_dists < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   arma::mat prod = corrs%numeric_mat;
   exposure = arma::sum(prod,
@@ -157,7 +160,7 @@ if(exposure_definition_indicator == 1){
 //Presence/Absence
 if(exposure_definition_indicator == 2){
   
-  arma::umat comparison = (exposure_dists < radius_mat);
+  arma::umat comparison = (v_exposure_dists < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::max(numeric_mat,
                        1);
@@ -266,7 +269,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    //radius Update
    Rcpp::List radius_output = radius_update(radius_range,
                                             exposure_definition_indicator,
-                                            exposure_dists,
+                                            v_exposure_dists,
                                             p_d,
                                             n_ind,
                                             m,
