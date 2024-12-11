@@ -16,6 +16,7 @@ Rcpp::List SingleBuffer(int mcmc_samples,
                         int p_d,
                         double metrop_var_radius,
                         int likelihood_indicator,
+                        Rcpp::Nullable<int> waic_info_indicator = R_NilValue,
                         Rcpp::Nullable<Rcpp::NumericVector> offset = R_NilValue,
                         Rcpp::Nullable<Rcpp::NumericVector> trials = R_NilValue,
                         Rcpp::Nullable<double> a_r_prior = R_NilValue,
@@ -34,6 +35,10 @@ Rcpp::List SingleBuffer(int mcmc_samples,
 int n_ind = y.size();
 int p_x = x.n_cols;
 int m = exposure_dists.n_cols;
+int waic_info_ind = 0;  //No by Default
+if(waic_info_indicator.isNotNull()){
+  waic_info_ind = Rcpp::as<int>(waic_info_indicator);
+  }
 
 arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
@@ -42,6 +47,7 @@ arma::mat eta((p_d + 1), mcmc_samples); eta.fill(0.00);
 arma::vec radius(mcmc_samples); radius.fill(0.00);
 arma::mat theta(1, mcmc_samples); theta.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
+arma::mat log_density(n_ind, mcmc_samples); log_density.fill(0.00);
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
 if(offset.isNotNull()){
@@ -172,17 +178,22 @@ for(int j = 0; j < (p_d + 1); ++j){
   Z.col(j) = exposure*poly(j);
   }
 
-neg_two_loglike(0) = neg_two_loglike_update(y,
-                                            x,
-                                            off_set,
-                                            tri_als,
-                                            likelihood_indicator,
-                                            n_ind,
-                                            r(0),
-                                            sigma2_epsilon(0),
-                                            beta.col(0),
-                                            eta.col(0),
-                                            Z);
+Rcpp::List fit_info = neg_two_loglike_update(y,
+                                             x,
+                                             off_set,
+                                             tri_als,
+                                             likelihood_indicator,
+                                             n_ind,
+                                             r(0),
+                                             sigma2_epsilon(0),
+                                             beta.col(0),
+                                             eta.col(0),
+                                             Z);
+
+neg_two_loglike(0) = Rcpp::as<double>(fit_info[0]);
+if(waic_info_ind == 1){
+  log_density.col(0) = Rcpp::as<arma::vec>(fit_info[1]);
+  }
 
 //Metropolis Settings
 int acctot_radius = 0;
@@ -327,19 +338,24 @@ for(int j = 1; j < mcmc_samples; ++j){
      }
    
    //neg_two_loglike Update
-   neg_two_loglike(j) = neg_two_loglike_update(y,
-                                               x,
-                                               off_set,
-                                               tri_als,
-                                               likelihood_indicator,
-                                               n_ind,
-                                               r(j),
-                                               sigma2_epsilon(j),
-                                               beta.col(j),
-                                               eta.col(j),
-                                               Z);
+   fit_info = neg_two_loglike_update(y,
+                                     x,
+                                     off_set,
+                                     tri_als,
+                                     likelihood_indicator,
+                                     n_ind,
+                                     r(j),
+                                     sigma2_epsilon(j),
+                                     beta.col(j),
+                                     eta.col(j),
+                                     Z);
+   
+   neg_two_loglike(j) = Rcpp::as<double>(fit_info[0]);
+   if(waic_info_ind == 1){
+     log_density.col(j) = Rcpp::as<arma::vec>(fit_info[1]);
+     }
   
-   //Progress
+  //Progress
    if((j + 1) % 10 == 0){ 
      Rcpp::checkUserInterrupt();
      }
@@ -358,13 +374,29 @@ for(int j = 1; j < mcmc_samples; ++j){
    
    }
 
-return Rcpp::List::create(Rcpp::Named("theta_scale") = m_max,
-                          Rcpp::Named("r") = r,
-                          Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
-                          Rcpp::Named("beta") = beta,
-                          Rcpp::Named("eta") = eta,
-                          Rcpp::Named("radius") = radius,
-                          Rcpp::Named("theta") = theta,
-                          Rcpp::Named("neg_two_loglike") = neg_two_loglike);
+if(waic_info_ind == 0){
+  return Rcpp::List::create(Rcpp::Named("theta_scale") = m_max,
+                            Rcpp::Named("r") = r,
+                            Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
+                            Rcpp::Named("beta") = beta,
+                            Rcpp::Named("eta") = eta,
+                            Rcpp::Named("radius") = radius,
+                            Rcpp::Named("theta") = theta,
+                            Rcpp::Named("neg_two_loglike") = neg_two_loglike);
+  }
 
+if(waic_info_ind == 1){
+  return Rcpp::List::create(Rcpp::Named("theta_scale") = m_max,
+                            Rcpp::Named("r") = r,
+                            Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
+                            Rcpp::Named("beta") = beta,
+                            Rcpp::Named("eta") = eta,
+                            Rcpp::Named("radius") = radius,
+                            Rcpp::Named("theta") = theta,
+                            Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("log_density") = log_density);
+  }
+
+return R_NilValue;
+  
 }
