@@ -375,7 +375,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    }
 
 if(waic_info_ind == 0){
-  return Rcpp::List::create(Rcpp::Named("theta_scale") = m_max,
+  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_max,
                             Rcpp::Named("r") = r,
                             Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
                             Rcpp::Named("beta") = beta,
@@ -386,7 +386,7 @@ if(waic_info_ind == 0){
   }
 
 if(waic_info_ind == 1){
-  return Rcpp::List::create(Rcpp::Named("theta_scale") = m_max,
+  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_max,
                             Rcpp::Named("r") = r,
                             Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
                             Rcpp::Named("beta") = beta,
