@@ -10,7 +10,7 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           arma::vec y,
                           arma::mat x,
                           arma::mat w,
-                          arma::mat v,
+                          Rcpp::IntegerVector v,
                           arma::vec radius_range,
                           int exposure_definition_indicator,
                           arma::mat exposure_dists,
@@ -43,7 +43,7 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
 int n_ind = y.size();
 int p_x = x.n_cols;
 int p_w = w.n_cols;
-int n_ind_unique = v.n_cols;
+int n_ind_unique = exposure_dists.n_rows;
 int m = exposure_dists.n_cols;
 int n_grid = full_dists.n_rows - 
              n_ind_unique;

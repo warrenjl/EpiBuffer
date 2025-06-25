@@ -9,11 +9,10 @@ using namespace Rcpp;
 Rcpp::List SingleBuffer(int mcmc_samples,
                         arma::vec y,
                         arma::mat x,
-                        arma::mat v,
+                        Rcpp::IntegerVector v,
                         arma::vec radius_range,
                         int exposure_definition_indicator,
                         arma::mat exposure_dists,
-                        int p_d,
                         double metrop_var_radius,
                         int likelihood_indicator,
                         Rcpp::Nullable<int> waic_info_indicator = R_NilValue,
@@ -32,6 +31,7 @@ Rcpp::List SingleBuffer(int mcmc_samples,
                         Rcpp::Nullable<double> radius_init = R_NilValue){
 
 //Defining Parameters and Quantities of Interest
+int p_d = 0;  //Hard-coded because the other options aren't identifiable
 int n_ind = y.size();
 int p_x = x.n_cols;
 int m = exposure_dists.n_cols;
@@ -59,8 +59,15 @@ if(trials.isNotNull()){
   tri_als = Rcpp::as<arma::vec>(trials);
   }
 
-arma::mat v_exposure_dists = v*exposure_dists; 
-
+arma::vec v_index(n_ind); v_index.fill(0);
+arma::mat v_exposure_dists(n_ind, m);
+for(int j = 0; j < n_ind; ++j){
+  
+  v_index(j) = v(j) - 1;
+  v_exposure_dists.row(j) = exposure_dists.row(v_index(j));
+  
+  }
+  
 //Prior Information
 int a_r = 1;
 if(a_r_prior.isNotNull()){
@@ -151,9 +158,10 @@ if(exposure_definition_indicator == 0){
 //Spherical
 if(exposure_definition_indicator == 1){
   
+  arma::mat fast = v_exposure_dists/radius_mat;
   arma::mat corrs = 1.00 +
-                    -1.50*(v_exposure_dists/radius_mat) +
-                    0.50*pow((v_exposure_dists/radius_mat), 3);
+                    -1.50*fast +
+                    0.50*pow(fast, 3);
   arma::umat comparison = (v_exposure_dists < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   arma::mat prod = corrs%numeric_mat;
