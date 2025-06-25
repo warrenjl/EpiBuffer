@@ -50,20 +50,17 @@ int n_grid = full_dists.n_rows -
 arma::mat dists22 = full_dists.submat(n_ind_unique, n_ind_unique, (n_ind_unique + n_grid - 1), (n_ind_unique + n_grid - 1));
 arma::mat dists12 = full_dists.submat(0, n_ind_unique, (n_ind_unique - 1), (n_ind_unique + n_grid - 1));
 double max_dist = dists22.max();
-arma::mat v_exposure_dists = v*exposure_dists; 
-arma::mat v_w = v*w;
 
 arma::vec v_index(n_ind); v_index.fill(0);
+arma::mat v_exposure_dists(n_ind, m);
+arma::mat v_w(n_ind, p_w);
 for(int j = 0; j < n_ind; ++j){
-  for(int k = 0; k < n_ind_unique; ++k){
-     if(v(j,k) == 1){
-       
-       v_index(j) = k;
-       break;
-       
-       }
-     }
-  }
+  
+   v_index(j) = v(j) - 1;
+   v_exposure_dists.row(j) = exposure_dists.row(v_index(j));
+   v_w.row(j) = w.row(v_index(j));
+   
+   }
 
 int waic_info_ind = 0;  //No by Default
 if(waic_info_indicator.isNotNull()){

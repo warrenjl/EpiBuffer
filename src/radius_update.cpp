@@ -61,10 +61,9 @@ if(exposure_definition_indicator == 0){
 //Spherical
 if(exposure_definition_indicator == 1){
   
-  arma::mat fast = v_exposure_dists/radius_mat;
   arma::mat corrs = 1.00 +
-                    -1.50*fast +
-                    0.50*pow(fast, 3);
+                    -1.50*(v_exposure_dists/radius_mat) +
+                    0.50*pow((v_exposure_dists/radius_mat), 3);
   arma::umat comparison = (v_exposure_dists < radius_mat);
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   arma::mat prod = corrs%numeric_mat;
