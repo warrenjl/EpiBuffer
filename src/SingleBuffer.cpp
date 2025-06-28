@@ -47,7 +47,7 @@ arma::mat eta((p_d + 1), mcmc_samples); eta.fill(0.00);
 arma::vec radius(mcmc_samples); radius.fill(0.00);
 arma::mat theta(1, mcmc_samples); theta.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
-arma::mat log_density(n_ind, mcmc_samples); log_density.fill(0.00);
+arma::mat log_density;
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
 if(offset.isNotNull()){
@@ -200,7 +200,10 @@ Rcpp::List fit_info = neg_two_loglike_update(y,
 
 neg_two_loglike(0) = Rcpp::as<double>(fit_info[0]);
 if(waic_info_ind == 1){
+  
+  log_density = arma::mat(n_ind, mcmc_samples); log_density.fill(0.00);
   log_density.col(0) = Rcpp::as<arma::vec>(fit_info[1]);
+  
   }
 
 //Metropolis Settings
