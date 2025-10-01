@@ -10,7 +10,7 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           arma::vec y,
                           arma::mat x,
                           arma::mat w,
-                          arma::mat v,
+                          Rcpp::IntegerVector v,
                           arma::vec radius_range,
                           int exposure_definition_indicator,
                           arma::mat exposure_dists,
@@ -29,7 +29,6 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           Rcpp::Nullable<double> b_sigma2_epsilon_prior = R_NilValue,
                           Rcpp::Nullable<double> sigma2_beta_prior = R_NilValue,
                           Rcpp::Nullable<double> sigma2_eta_prior = R_NilValue,
-                          Rcpp::Nullable<double> sigma2_gamma_prior = R_NilValue,
                           Rcpp::Nullable<double> a_rho_phi_prior = R_NilValue,
                           Rcpp::Nullable<double> b_rho_phi_prior = R_NilValue,
                           Rcpp::Nullable<double> r_init = R_NilValue,
@@ -43,27 +42,24 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
 int n_ind = y.size();
 int p_x = x.n_cols;
 int p_w = w.n_cols;
-int n_ind_unique = v.n_cols;
+int n_ind_unique = exposure_dists.n_rows;
 int m = exposure_dists.n_cols;
 int n_grid = full_dists.n_rows - 
              n_ind_unique;
 arma::mat dists22 = full_dists.submat(n_ind_unique, n_ind_unique, (n_ind_unique + n_grid - 1), (n_ind_unique + n_grid - 1));
 arma::mat dists12 = full_dists.submat(0, n_ind_unique, (n_ind_unique - 1), (n_ind_unique + n_grid - 1));
 double max_dist = dists22.max();
-arma::mat v_exposure_dists = v*exposure_dists; 
-arma::mat v_w = v*w;
 
 arma::vec v_index(n_ind); v_index.fill(0);
+arma::mat v_exposure_dists(n_ind, m);
+arma::mat v_w(n_ind, p_w);
 for(int j = 0; j < n_ind; ++j){
-  for(int k = 0; k < n_ind_unique; ++k){
-     if(v(j,k) == 1){
-       
-       v_index(j) = k;
-       break;
-       
-       }
-     }
-  }
+  
+   v_index(j) = v(j) - 1;
+   v_exposure_dists.row(j) = exposure_dists.row(v_index(j));
+   v_w.row(j) = w.row(v_index(j));
+   
+   }
 
 int waic_info_ind = 0;  //No by Default
 if(waic_info_indicator.isNotNull()){
@@ -79,7 +75,7 @@ arma::vec rho_phi(mcmc_samples); rho_phi.fill(0.00);
 arma::mat radius(n_ind, mcmc_samples); radius.fill(0.00);
 arma::mat theta(n_ind, mcmc_samples); theta.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
-arma::mat log_density(n_ind, mcmc_samples); log_density.fill(0.00);
+arma::mat log_density;
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
 if(offset.isNotNull()){
@@ -120,11 +116,6 @@ if(sigma2_beta_prior.isNotNull()){
 double sigma2_eta = 10000.00;
 if(sigma2_eta_prior.isNotNull()){
   sigma2_eta = Rcpp::as<double>(sigma2_eta_prior);
-  }
-
-double sigma2_gamma = 1.00;
-if(sigma2_gamma_prior.isNotNull()){
-  sigma2_gamma = Rcpp::as<double>(sigma2_gamma_prior);
   }
 
 double a_rho_phi = 1.00;
@@ -270,7 +261,10 @@ Rcpp::List fit_info = neg_two_loglike_update(y,
 
 neg_two_loglike(0) = Rcpp::as<double>(fit_info[0]);
 if(waic_info_ind == 1){
+  
+  log_density = arma::mat(n_ind, mcmc_samples); log_density.fill(0.00);
   log_density.col(0) = Rcpp::as<arma::vec>(fit_info[1]);
+  
   }
 
 //Metropolis Settings
@@ -370,7 +364,6 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           v_w,
                                           v_index,
                                           off_set,
-                                          sigma2_gamma,
                                           omega,
                                           lambda,
                                           beta.col(j), 
