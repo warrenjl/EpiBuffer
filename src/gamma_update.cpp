@@ -18,7 +18,6 @@ Rcpp::List gamma_update(arma::vec radius_range,
                         arma::mat v_w,
                         arma::vec v_index,
                         arma::vec off_set,
-                        double sigma2_gamma,
                         arma::vec omega,
                         arma::vec lambda,
                         arma::vec beta, 
@@ -50,7 +49,7 @@ for(int j = 0; j < p_w; ++j){
    arma::mat Z_old = Z;
    
    denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
-            -(0.50/sigma2_gamma)*pow(gamma(j), 2);
+            -0.50*pow(gamma(j), 2);
             
    //First
    gamma(j) = R::rnorm(gamma_old(j),
@@ -124,7 +123,7 @@ for(int j = 0; j < p_w; ++j){
       }
    
    numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
-           -(0.50/sigma2_gamma)*pow(gamma(j), 2);
+           -0.50*pow(gamma(j), 2);
       
    /*Decision*/
    double ratio = exp(numer - denom);   

@@ -5,8 +5,8 @@ SingleBuffer <- function(mcmc_samples, y, x, v, radius_range, exposure_definitio
     .Call(`_EpiBuffer_SingleBuffer`, mcmc_samples, y, x, v, radius_range, exposure_definition_indicator, exposure_dists, metrop_var_radius, likelihood_indicator, waic_info_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, sigma2_eta_prior, r_init, sigma2_epsilon_init, beta_init, eta_init, radius_init)
 }
 
-SpatialBuffers <- function(mcmc_samples, y, x, w, v, radius_range, exposure_definition_indicator, exposure_dists, p_d, full_dists, metrop_var_gamma, metrop_var_phi_star, metrop_var_rho_phi, likelihood_indicator, waic_info_indicator = NULL, offset = NULL, trials = NULL, a_r_prior = NULL, b_r_prior = NULL, a_sigma2_epsilon_prior = NULL, b_sigma2_epsilon_prior = NULL, sigma2_beta_prior = NULL, sigma2_eta_prior = NULL, sigma2_gamma_prior = NULL, a_rho_phi_prior = NULL, b_rho_phi_prior = NULL, r_init = NULL, sigma2_epsilon_init = NULL, beta_init = NULL, eta_init = NULL, gamma_init = NULL, rho_phi_init = NULL) {
-    .Call(`_EpiBuffer_SpatialBuffers`, mcmc_samples, y, x, w, v, radius_range, exposure_definition_indicator, exposure_dists, p_d, full_dists, metrop_var_gamma, metrop_var_phi_star, metrop_var_rho_phi, likelihood_indicator, waic_info_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, sigma2_eta_prior, sigma2_gamma_prior, a_rho_phi_prior, b_rho_phi_prior, r_init, sigma2_epsilon_init, beta_init, eta_init, gamma_init, rho_phi_init)
+SpatialBuffers <- function(mcmc_samples, y, x, w, v, radius_range, exposure_definition_indicator, exposure_dists, p_d, full_dists, metrop_var_gamma, metrop_var_phi_star, metrop_var_rho_phi, likelihood_indicator, waic_info_indicator = NULL, offset = NULL, trials = NULL, a_r_prior = NULL, b_r_prior = NULL, a_sigma2_epsilon_prior = NULL, b_sigma2_epsilon_prior = NULL, sigma2_beta_prior = NULL, sigma2_eta_prior = NULL, a_rho_phi_prior = NULL, b_rho_phi_prior = NULL, r_init = NULL, sigma2_epsilon_init = NULL, beta_init = NULL, eta_init = NULL, gamma_init = NULL, rho_phi_init = NULL) {
+    .Call(`_EpiBuffer_SpatialBuffers`, mcmc_samples, y, x, w, v, radius_range, exposure_definition_indicator, exposure_dists, p_d, full_dists, metrop_var_gamma, metrop_var_phi_star, metrop_var_rho_phi, likelihood_indicator, waic_info_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_beta_prior, sigma2_eta_prior, a_rho_phi_prior, b_rho_phi_prior, r_init, sigma2_epsilon_init, beta_init, eta_init, gamma_init, rho_phi_init)
 }
 
 beta_update <- function(x, off_set, n_ind, p_x, sigma2_beta, omega, lambda, eta_old, Z) {
@@ -17,8 +17,8 @@ eta_update <- function(x, off_set, n_ind, p_d, sigma2_eta, omega, lambda, beta, 
     .Call(`_EpiBuffer_eta_update`, x, off_set, n_ind, p_d, sigma2_eta, omega, lambda, beta, Z)
 }
 
-gamma_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_d, n_ind, m, m_max, p_w, x, v_w, v_index, off_set, sigma2_gamma, omega, lambda, beta, eta, gamma_old, radius, theta, radius_trans, phi_tilde, poly, exposure, Z, metrop_var_gamma, acctot_gamma) {
-    .Call(`_EpiBuffer_gamma_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_d, n_ind, m, m_max, p_w, x, v_w, v_index, off_set, sigma2_gamma, omega, lambda, beta, eta, gamma_old, radius, theta, radius_trans, phi_tilde, poly, exposure, Z, metrop_var_gamma, acctot_gamma)
+gamma_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_d, n_ind, m, m_max, p_w, x, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, radius, theta, radius_trans, phi_tilde, poly, exposure, Z, metrop_var_gamma, acctot_gamma) {
+    .Call(`_EpiBuffer_gamma_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_d, n_ind, m, m_max, p_w, x, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, radius, theta, radius_trans, phi_tilde, poly, exposure, Z, metrop_var_gamma, acctot_gamma)
 }
 
 latent_update <- function(y, x, off_set, tri_als, likelihood_indicator, n_ind, r_old, beta_old, eta_old, Z) {
