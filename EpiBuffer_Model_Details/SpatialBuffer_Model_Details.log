@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.6.23)  1 OCT 2025 09:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.6.23)  1 OCT 2025 10:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -588,7 +588,7 @@ LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 8
 (C:\Users\jlw98\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-Overfull \hbox (11.18336pt too wide) detected at line 98
+Overfull \hbox (11.18336pt too wide) detected at line 101
 \OML/lmm/m/it/10 Y[]\OT1/lmr/m/n/10 ([][])\OMS/lmsy/m/n/10 j\OML/lmm/m/it/10 r;
  p[]\OT1/lmr/m/n/10 ([][]) [] [] [] \OML/lmm/m/it/10 ; [] [] \OT1/lmr/m/n/10 = 
 [][]([][]) + [][]([][])[][] + [] [] \OML/lmm/m/it/10 ^^R [] :
@@ -599,13 +599,13 @@ Overfull \hbox (11.18336pt too wide) detected at line 98
 {C:/Users/jlw98/AppData/Local/MiKTeX/2.9/fonts/map/pdftex/pdftex.map}] [2] (Spa
 tialBuffer_Model_Details.aux) ) 
 Here is how much of TeX's memory you used:
- 13207 strings out of 478343
- 213300 string characters out of 2834742
- 570541 words of memory out of 3000000
- 31336 multiletter control sequences out of 15000+600000
- 526220 words of font info for 99 fonts, out of 8000000 for 9000
+ 13216 strings out of 478343
+ 213403 string characters out of 2834742
+ 571586 words of memory out of 3000000
+ 31338 multiletter control sequences out of 15000+600000
+ 526469 words of font info for 102 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,7n,81p,1352b,504s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 74i,7n,81p,1352b,488s stack positions out of 10000i,1000n,20000p,200000b,80000s
 {C:/Users/jlw98/AppData/Local/Programs/MiKTeX 2.
 9/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/jlw98/AppData/Local/Programs/MiKTeX 2.
 9/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/jlw98/AppData/Local/Programs/MiKTe
@@ -626,9 +626,9 @@ sers/jlw98/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmr5.pfb><C:
 C:/Users/jlw98/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.p
 fb><C:/Users/jlw98/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmsy
 7.pfb>
-Output written on SpatialBuffer_Model_Details.pdf (2 pages, 189968 bytes).
+Output written on SpatialBuffer_Model_Details.pdf (2 pages, 192901 bytes).
 PDF statistics:
- 124 PDF objects out of 1000 (max. 8388607)
- 10 named destinations out of 1000 (max. 500000)
- 34873 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 128 PDF objects out of 1000 (max. 8388607)
+ 11 named destinations out of 1000 (max. 500000)
+ 34881 words of extra memory for PDF output out of 35830 (max. 10000000)
 

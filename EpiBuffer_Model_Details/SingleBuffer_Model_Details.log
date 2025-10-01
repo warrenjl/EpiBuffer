@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.6.23)  1 OCT 2025 09:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.6.23)  1 OCT 2025 10:06
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -594,11 +594,11 @@ gleBuffer_Model_Details.aux) )
 Here is how much of TeX's memory you used:
  13204 strings out of 478343
  213215 string characters out of 2834742
- 565459 words of memory out of 3000000
+ 564459 words of memory out of 3000000
  31334 multiletter control sequences out of 15000+600000
  526220 words of font info for 99 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,6n,81p,1351b,504s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 74i,6n,81p,1351b,486s stack positions out of 10000i,1000n,20000p,200000b,80000s
 {C:/Users/jlw98/AppData/Local/Programs/MiKTeX 2.9
 /fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/jlw98/AppData/Local/Programs/MiKTeX
  2.9/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/jlw98/AppData/Local/Programs/Mi
@@ -619,7 +619,7 @@ Users/jlw98/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmr7.pfb><C
 :/Users/jlw98/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pf
 b><C:/Users/jlw98/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmsy7
 .pfb>
-Output written on SingleBuffer_Model_Details.pdf (2 pages, 180903 bytes).
+Output written on SingleBuffer_Model_Details.pdf (2 pages, 181323 bytes).
 PDF statistics:
  120 PDF objects out of 1000 (max. 8388607)
  9 named destinations out of 1000 (max. 500000)
