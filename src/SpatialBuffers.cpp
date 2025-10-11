@@ -9,15 +9,16 @@ using namespace Rcpp;
 Rcpp::List SpatialBuffers(int mcmc_samples,
                           arma::vec y,
                           arma::mat x,
+                          arma::mat q,
                           arma::mat w,
                           Rcpp::IntegerVector v,
                           arma::vec radius_range,
                           int exposure_definition_indicator,
                           arma::mat exposure_dists,
-                          int p_d,
                           arma::mat full_dists,
                           arma::vec metrop_var_gamma,
                           arma::vec metrop_var_phi_star,
+                          double metrop_var_tau_phi,
                           double metrop_var_rho_phi,
                           int likelihood_indicator,
                           Rcpp::Nullable<int> waic_info_indicator = R_NilValue,
@@ -36,11 +37,13 @@ Rcpp::List SpatialBuffers(int mcmc_samples,
                           Rcpp::Nullable<Rcpp::NumericVector> beta_init = R_NilValue,
                           Rcpp::Nullable<Rcpp::NumericVector> eta_init = R_NilValue,
                           Rcpp::Nullable<Rcpp::NumericVector> gamma_init = R_NilValue,
+                          Rcpp::Nullable<double> tau_phi_init = R_NilValue,
                           Rcpp::Nullable<double> rho_phi_init = R_NilValue){
   
 //Defining Parameters and Quantities of Interest
 int n_ind = y.size();
 int p_x = x.n_cols;
+int p_q = q.n_cols;
 int p_w = w.n_cols;
 int n_ind_unique = exposure_dists.n_rows;
 int m = exposure_dists.n_cols;
@@ -69,8 +72,9 @@ if(waic_info_indicator.isNotNull()){
 arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
 arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
-arma::mat eta((p_d + 1), mcmc_samples); eta.fill(0.00);
+arma::mat eta(p_q, mcmc_samples); eta.fill(0.00);
 arma::mat gamma(p_w, mcmc_samples); gamma.fill(0.00);
+arma::vec tau_phi(mcmc_samples); tau_phi.fill(0.00);
 arma::vec rho_phi(mcmc_samples); rho_phi.fill(0.00);
 arma::mat radius(n_ind, mcmc_samples); radius.fill(0.00);
 arma::mat theta(n_ind, mcmc_samples); theta.fill(0.00);
@@ -154,16 +158,21 @@ if(gamma_init.isNotNull()){
   gamma.col(0) = Rcpp::as<arma::vec>(gamma_init);
   }
 
+tau_phi(0) = 0.50;
+if(tau_phi_init.isNotNull()){
+  tau_phi(0) = Rcpp::as<double>(tau_phi_init);
+  }
+
 rho_phi(0) = -log(0.05)/max_dist;  //Effective range equal to largest distance in dataset (strong spatial correlation)
 if(rho_phi_init.isNotNull()){
   rho_phi(0) = Rcpp::as<double>(rho_phi_init);
   }                                                
-Rcpp::List spatial_corr_info = spatial_corr_fun(rho_phi(0),
-                                                dists22);
+Rcpp::List phi_star_corr_info = spatial_corr_fun(rho_phi(0),
+                                                 dists22);
 
 arma::vec phi_star(n_grid); phi_star.fill(0.00);
 arma::mat C = exp(-rho_phi(0)*dists12);
-arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(spatial_corr_info[0])*phi_star);
+arma::vec phi_tilde = C*(Rcpp::as<arma::mat>(phi_star_corr_info[0])*phi_star);
 arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
 for(int j = 0; j < n_ind; ++j){
    phi_tilde_full(j) = phi_tilde(v_index(j));
@@ -188,11 +197,7 @@ for(int j = 0; j < n_ind; ++ j){
    }
 
 arma::vec exposure(n_ind); exposure.fill(0.00);
-arma::mat poly(n_ind, (p_d + 1)); poly.fill(0.00);
-for(int j = 0; j < (p_d + 1); ++j){
-  poly.col(j) = pow((radius.col(0) - radius_range(0))/(radius_range(1) - radius_range(0)), j);
-  }
-theta.col(0) = poly*eta.col(0);
+theta.col(0) = q*eta.col(0);
 
 //Determine Max Possible Exposure
 arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
@@ -242,9 +247,9 @@ if(exposure_definition_indicator == 2){
   
   }
 
-arma::mat Z(n_ind, (p_d + 1));
-for(int j = 0; j < (p_d + 1); ++j){
-  Z.col(j) = exposure%poly.col(j);
+arma::mat Z(n_ind, p_q);
+for(int j = 0; j < p_q; ++j){
+  Z.col(j) = exposure%q.col(j);
   }
 
 Rcpp::List fit_info = neg_two_loglike_update(y,
@@ -270,6 +275,7 @@ if(waic_info_ind == 1){
 //Metropolis Settings
 arma::vec acctot_gamma(p_w); acctot_gamma.fill(0);
 arma::vec acctot_phi_star(n_grid); acctot_phi_star.fill(0);
+int acctot_tau_phi = 0;
 int acctot_rho_phi = 0;
 
 //Main Sampling Loop
@@ -343,24 +349,25 @@ for(int j = 1; j < mcmc_samples; ++j){
    eta.col(j) = eta_update(x,
                            off_set,
                            n_ind,
-                           p_d,
+                           p_q,
                            sigma2_eta,
                            omega,
                            lambda,
                            beta.col(j),
                            Z);
-   theta.col(j) = poly*eta.col(j);
+   theta.col(j) = q*eta.col(j);
    
    //gamma update
    Rcpp::List gamma_output = gamma_update(radius_range,
                                           exposure_definition_indicator,
                                           v_exposure_dists,
-                                          p_d,
+                                          p_q,
                                           n_ind,
                                           m,
                                           m_max,
                                           p_w,
                                           x,
+                                          q,
                                           v_w,
                                           v_index,
                                           off_set,
@@ -373,7 +380,6 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           theta.col(j),
                                           radius_trans,
                                           phi_tilde,
-                                          poly,
                                           exposure,
                                           Z,
                                           metrop_var_gamma,
@@ -382,23 +388,22 @@ for(int j = 1; j < mcmc_samples; ++j){
    gamma.col(j) = Rcpp::as<arma::vec>(gamma_output[0]); 
    acctot_gamma = Rcpp::as<arma::vec>(gamma_output[1]);
    radius.col(j) = Rcpp::as<arma::vec>(gamma_output[2]);
-   theta.col(j) = Rcpp::as<arma::vec>(gamma_output[3]);
-   radius_trans = Rcpp::as<arma::vec>(gamma_output[4]);
-   poly = Rcpp::as<arma::mat>(gamma_output[5]);
-   exposure = Rcpp::as<arma::vec>(gamma_output[6]);
-   Z = Rcpp::as<arma::mat>(gamma_output[7]);
+   radius_trans = Rcpp::as<arma::vec>(gamma_output[3]);
+   exposure = Rcpp::as<arma::vec>(gamma_output[4]);
+   Z = Rcpp::as<arma::mat>(gamma_output[5]);
    
    //phi_star Update
    Rcpp::List phi_star_output = phi_star_update(radius_range,
                                                 exposure_definition_indicator,
                                                 v_exposure_dists,
-                                                p_d,
+                                                p_q,
                                                 n_ind,
                                                 n_grid,
                                                 m,
                                                 m_max,
                                                 p_w,
                                                 x,
+                                                q,
                                                 v_w,
                                                 v_index,
                                                 off_set,
@@ -412,9 +417,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 radius_trans,
                                                 phi_star,
                                                 phi_tilde,
-                                                spatial_corr_info[0],
+                                                phi_star_corr_info[0],
                                                 C,
-                                                poly,
                                                 exposure,
                                                 Z,
                                                 metrop_var_phi_star,
@@ -423,24 +427,34 @@ for(int j = 1; j < mcmc_samples; ++j){
    phi_star = Rcpp::as<arma::vec>(phi_star_output[0]);
    acctot_phi_star = Rcpp::as<arma::vec>(phi_star_output[1]);
    radius.col(j) = Rcpp::as<arma::vec>(phi_star_output[2]);
-   theta.col(j) = Rcpp::as<arma::mat>(phi_star_output[3]);
-   radius_trans = Rcpp::as<arma::vec>(phi_star_output[4]);
-   phi_tilde = Rcpp::as<arma::vec>(phi_star_output[5]);
-   poly = Rcpp::as<arma::mat>(phi_star_output[6]);
-   exposure = Rcpp::as<arma::vec>(phi_star_output[7]);
-   Z = Rcpp::as<arma::mat>(phi_star_output[8]);
+   radius_trans = Rcpp::as<arma::vec>(phi_star_output[3]);
+   phi_tilde = Rcpp::as<arma::vec>(phi_star_output[4]);
+   exposure = Rcpp::as<arma::vec>(phi_star_output[5]);
+   Z = Rcpp::as<arma::mat>(phi_star_output[6]);
+   
+   //tau_phi Update
+   Rcpp::List tau_phi_output = tau_phi_update(n_grid,
+                                              tau_phi(j-1),
+                                              phi_star,
+                                              phi_star_corr_info[0],
+                                              metrop_var_tau_phi,
+                                              acctot_tau_phi);
+   
+   tau_phi(j) = Rcpp::as<double>(tau_phi_output[0]);
+   acctot_tau_phi = Rcpp::as<int>(tau_phi_output[1]);
    
    //rho_phi Update
    Rcpp::List rho_phi_output = rho_phi_update(radius_range,
                                               exposure_definition_indicator,
                                               v_exposure_dists,
-                                              p_d,
+                                              p_q,
                                               n_ind,
                                               n_grid,
                                               m,
                                               m_max,
                                               p_w,
                                               x,
+                                              q,
                                               v_w,
                                               v_index,
                                               off_set,
@@ -459,9 +473,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               radius_trans,
                                               phi_star,
                                               phi_tilde,
-                                              spatial_corr_info,
+                                              phi_star_corr_info,
                                               C,
-                                              poly,
                                               exposure,
                                               Z,
                                               metrop_var_rho_phi,
@@ -470,14 +483,12 @@ for(int j = 1; j < mcmc_samples; ++j){
    rho_phi(j) = Rcpp::as<double>(rho_phi_output[0]);
    acctot_rho_phi = Rcpp::as<int>(rho_phi_output[1]);
    radius.col(j) = Rcpp::as<arma::vec>(rho_phi_output[2]);
-   theta.col(j) = Rcpp::as<arma::vec>(rho_phi_output[3]);
-   radius_trans = Rcpp::as<arma::vec>(rho_phi_output[4]);
-   phi_tilde = Rcpp::as<arma::vec>(rho_phi_output[5]);
-   spatial_corr_info = Rcpp::as<Rcpp::List>(rho_phi_output[6]);
-   C = Rcpp::as<arma::mat>(rho_phi_output[7]);
-   poly = Rcpp::as<arma::mat>(rho_phi_output[8]);
-   exposure = Rcpp::as<arma::vec>(rho_phi_output[9]);
-   Z = Rcpp::as<arma::mat>(rho_phi_output[10]);
+   radius_trans = Rcpp::as<arma::vec>(rho_phi_output[3]);
+   phi_tilde = Rcpp::as<arma::vec>(rho_phi_output[4]);
+   phi_star_corr_info = Rcpp::as<Rcpp::List>(rho_phi_output[5]);
+   C = Rcpp::as<arma::mat>(rho_phi_output[6]);
+   exposure = Rcpp::as<arma::vec>(rho_phi_output[7]);
+   Z = Rcpp::as<arma::mat>(rho_phi_output[8]);
    
    if(likelihood_indicator == 2){
      
@@ -566,6 +577,7 @@ if(waic_info_ind == 0){
                             Rcpp::Named("gamma") = gamma,
                             Rcpp::Named("radius") = radius,
                             Rcpp::Named("theta") = theta,
+                            Rcpp::Named("tau_phi") = tau_phi,
                             Rcpp::Named("rho_phi") = rho_phi,
                             Rcpp::Named("neg_two_loglike") = neg_two_loglike);
   }
@@ -579,6 +591,7 @@ if(waic_info_ind == 1){
                             Rcpp::Named("gamma") = gamma,
                             Rcpp::Named("radius") = radius,
                             Rcpp::Named("theta") = theta,
+                            Rcpp::Named("tau_phi") = tau_phi,
                             Rcpp::Named("rho_phi") = rho_phi,
                             Rcpp::Named("neg_two_loglike") = neg_two_loglike,
                             Rcpp::Named("log_density") = log_density);
