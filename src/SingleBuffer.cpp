@@ -118,7 +118,7 @@ if(beta_init.isNotNull()){
 
 eta.col(0).fill(0.00);
 if(eta_init.isNotNull()){
-  eta.col(0).fill(Rcpp::as<double>(eta_init));
+  eta.col(0) = Rcpp::as<arma::vec>(eta_init);
   }
 
 radius(0) = (radius_range(1) - radius_range(0))/2.00;
