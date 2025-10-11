@@ -466,7 +466,6 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               eta.col(j),
                                               gamma.col(j),
                                               radius.col(j),
-                                              theta.col(j),
                                               rho_phi(j-1),
                                               radius_trans,
                                               phi_star,
