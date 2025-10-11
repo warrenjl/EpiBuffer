@@ -107,7 +107,7 @@ Negative binomial specific:  $r \sim \text{Discrete Uniform}\left[a_r, b_r\right
 
 * It is recommended to scale the matrix of spatial distances by the largest observed distance in the matrix prior to running the model.
 
-* The full_dists matrix is a $k*m$ by $k*m$ matrix where the upper left $m$ by $m$ matrix describes the distances between the $m$ observed locations, the bottom right $k$ by $k$ matrix describes the distances between the selected grid of $k<<m$ locations (if the computational version is used), and the off-diagonal matrices describe the distances between the observed and grid locations (i.e., this full distances matrix is computed after stacking the observed locations and sampled grid locations into a single vector).  If the computational version is not needed, input the observed locations instead of the sampled locations when calculating these distances.
+* The full_dists matrix is a $m + k$ by $m + k$ matrix where the upper left $m$ by $m$ matrix describes the distances between the $m$ observed locations, the bottom right $k$ by $k$ matrix describes the distances between the selected grid of $k<<m$ locations (if the computational version is used), and the off-diagonal matrices describe the distances between the observed and grid locations (i.e., this full distances matrix is computed after stacking the observed locations and sampled grid locations into a single vector).  If the computational version is not needed, input the observed locations instead of the sampled locations when calculating these distances.
 
 
 \pagebreak
