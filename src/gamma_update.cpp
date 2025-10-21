@@ -9,13 +9,12 @@ using namespace Rcpp;
 Rcpp::List gamma_update(arma::vec radius_range,
                         int exposure_definition_indicator,
                         arma::mat v_exposure_dists,
-                        int p_q,
+                        int p_d,
                         int n_ind,
                         int m,
                         int m_max,
                         int p_w,
                         arma::mat x,
-                        arma::mat q,
                         arma::mat v_w,
                         arma::vec v_index,
                         arma::vec off_set,
@@ -25,8 +24,10 @@ Rcpp::List gamma_update(arma::vec radius_range,
                         arma::vec eta,
                         arma::vec gamma_old,
                         arma::vec radius,
+                        arma::vec theta,
                         arma::vec radius_trans,
                         arma::vec phi_tilde,
+                        arma::mat poly,
                         arma::vec exposure,
                         arma::mat Z,
                         arma::vec metrop_var_gamma,
@@ -41,7 +42,9 @@ for(int j = 0; j < p_w; ++j){
   
    //Second
    arma::vec radius_old = radius;
+   arma::vec theta_old = theta;
    arma::vec radius_trans_old = radius_trans;
+   arma::mat poly_old = poly;
    arma::vec exposure_old = exposure;
    arma::mat Z_old = Z;
    
@@ -72,6 +75,11 @@ for(int j = 0; j < p_w; ++j){
    for(int k = 0; k < n_ind; ++k){
       radius_mat.row(k).fill(radius(k));
       }
+   
+   for(int k = 0; k < (p_d + 1); ++k){
+      poly.col(k) = pow((radius - radius_range(0))/(radius_range(1) - radius_range(0)), k);
+      }
+   theta = poly*eta;
      
    //Cumulative Counts
    if(exposure_definition_indicator == 0){
@@ -110,8 +118,8 @@ for(int j = 0; j < p_w; ++j){
        
      }
      
-   for(int k = 0; k < p_q; ++k){
-      Z.col(k) = exposure%q.col(k);
+   for(int k = 0; k < (p_d + 1); ++k){
+      Z.col(k) = exposure%poly.col(k);
       }
    
    numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
@@ -124,7 +132,9 @@ for(int j = 0; j < p_w; ++j){
         
      gamma(j) = gamma_old(j);
      radius = radius_old;
+     theta = theta_old;
      radius_trans = radius_trans_old;
+     poly = poly_old;
      exposure = exposure_old;
      Z = Z_old;
      acc = 0;
@@ -138,7 +148,9 @@ for(int j = 0; j < p_w; ++j){
 return Rcpp::List::create(Rcpp::Named("gamma") = gamma,
                           Rcpp::Named("acctot_gamma") = acctot_gamma,
                           Rcpp::Named("radius") = radius,
+                          Rcpp::Named("theta") = theta,                     
                           Rcpp::Named("radius_trans") = radius_trans,
+                          Rcpp::Named("poly") = poly,
                           Rcpp::Named("exposure") = exposure,
                           Rcpp::Named("Z") = Z);
 

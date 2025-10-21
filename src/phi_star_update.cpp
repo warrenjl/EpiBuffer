@@ -9,14 +9,13 @@ using namespace Rcpp;
 Rcpp::List phi_star_update(arma::vec radius_range,
                            int exposure_definition_indicator,
                            arma::mat v_exposure_dists,
-                           int p_q,
+                           int p_d,
                            int n_ind,
                            int n_grid,
                            int m,
                            int m_max,
                            int p_w,
                            arma::mat x,
-                           arma::mat q,
                            arma::mat v_w,
                            arma::vec v_index,
                            arma::vec off_set,
@@ -26,11 +25,13 @@ Rcpp::List phi_star_update(arma::vec radius_range,
                            arma::vec eta,
                            arma::vec gamma,
                            arma::vec radius,
+                           arma::vec theta,
                            arma::vec radius_trans,
                            arma::vec phi_star,
                            arma::vec phi_tilde,
                            arma::mat phi_star_corr_inv,
                            arma::mat C,
+                           arma::mat poly,
                            arma::vec exposure,
                            arma::mat Z,
                            arma::vec metrop_var_phi_star,
@@ -43,9 +44,11 @@ for(int j = 0; j < n_grid; ++j){
 
    //Second
    arma::vec radius_old = radius;
+   arma::vec theta_old = theta;
    arma::vec radius_trans_old = radius_trans;
    arma::vec phi_star_old = phi_star;
    arma::vec phi_tilde_old = phi_tilde;
+   arma::mat poly_old = poly;
    arma::vec exposure_old = exposure;
    arma::mat Z_old = Z;
    
@@ -78,6 +81,11 @@ for(int j = 0; j < n_grid; ++j){
    for(int k = 0; k < n_ind; ++ k){
       radius_mat.row(k).fill(radius(k));
       }
+   
+   for(int k = 0; k < (p_d + 1); ++k){
+      poly.col(k) = pow((radius - radius_range(0))/(radius_range(1) - radius_range(0)), k);
+      }
+   theta = poly*eta;
    
    //Cumulative Counts
    if(exposure_definition_indicator == 0){
@@ -116,8 +124,8 @@ for(int j = 0; j < n_grid; ++j){
      
      }
    
-   for(int k = 0; k < p_q; ++k){
-      Z.col(k) = exposure%q.col(k);
+   for(int k = 0; k < (p_d + 1); ++k){
+      Z.col(k) = exposure%poly.col(k);
       } 
    numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star));
@@ -128,9 +136,11 @@ for(int j = 0; j < n_grid; ++j){
    if(ratio < R::runif(0.00, 1.00)){
        
      radius = radius_old;
+     theta = theta_old;
      radius_trans = radius_trans_old;
      phi_star(j) = phi_star_old(j);
      phi_tilde = phi_tilde_old;
+     poly = poly_old;
      exposure = exposure_old;
      Z = Z_old;
      acc = 0;
@@ -144,8 +154,10 @@ for(int j = 0; j < n_grid; ++j){
 return Rcpp::List::create(Rcpp::Named("phi_star") = phi_star,
                           Rcpp::Named("acctot_phi_star") = acctot_phi_star,
                           Rcpp::Named("radius") = radius,
+                          Rcpp::Named("theta") = theta,
                           Rcpp::Named("radius_trans") = radius_trans,
                           Rcpp::Named("phi_tilde") = phi_tilde,
+                          Rcpp::Named("poly") = poly,
                           Rcpp::Named("exposure") = exposure,
                           Rcpp::Named("Z") = Z);
                           

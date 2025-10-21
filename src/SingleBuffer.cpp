@@ -9,7 +9,6 @@ using namespace Rcpp;
 Rcpp::List SingleBuffer(int mcmc_samples,
                         arma::vec y,
                         arma::mat x,
-                        arma::mat q,
                         Rcpp::IntegerVector v,
                         arma::vec radius_range,
                         int exposure_definition_indicator,
@@ -32,9 +31,9 @@ Rcpp::List SingleBuffer(int mcmc_samples,
                         Rcpp::Nullable<double> radius_init = R_NilValue){
 
 //Defining Parameters and Quantities of Interest
+int p_d = 0;  //Hard-coded because the other options aren't identifiable
 int n_ind = y.size();
 int p_x = x.n_cols;
-int p_q = q.n_cols;
 int m = exposure_dists.n_cols;
 int waic_info_ind = 0;  //No by Default
 if(waic_info_indicator.isNotNull()){
@@ -44,9 +43,9 @@ if(waic_info_indicator.isNotNull()){
 arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
 arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
-arma::mat eta(p_q, mcmc_samples); eta.fill(0.00);
+arma::mat eta((p_d + 1), mcmc_samples); eta.fill(0.00);
 arma::vec radius(mcmc_samples); radius.fill(0.00);
-arma::mat theta(n_ind, mcmc_samples); theta.fill(0.00);
+arma::mat theta(1, mcmc_samples); theta.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
 arma::mat log_density;
 
@@ -118,7 +117,7 @@ if(beta_init.isNotNull()){
 
 eta.col(0).fill(0.00);
 if(eta_init.isNotNull()){
-  eta.col(0) = Rcpp::as<arma::vec>(eta_init);
+  eta.col(0).fill(Rcpp::as<double>(eta_init));
   }
 
 radius(0) = (radius_range(1) - radius_range(0))/2.00;
@@ -128,7 +127,11 @@ if(radius_init.isNotNull()){
 double radius_trans = log((radius(0) - radius_range(0))/(radius_range(1) - radius(0)));
 arma::mat radius_mat(n_ind, m); radius_mat.fill(radius(0));
 arma::vec exposure(n_ind); exposure.fill(0.00);
-theta.col(0) = q*eta.col(0);
+arma::vec poly(p_d + 1); poly.fill(0.00);
+for(int j = 0; j < (p_d + 1); ++j){
+   poly(j) = pow((radius(0) - radius_range(0))/(radius_range(1) - radius_range(0)), j);
+   }
+theta.col(0) = dot(poly, eta.col(0));
 
 //Determine Max Possible Exposure
 arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
@@ -178,9 +181,9 @@ if(exposure_definition_indicator == 2){
   
   }
 
-arma::mat Z(n_ind, p_q);
-for(int j = 0; j < p_q; ++j){
-  Z.col(j) = exposure%q.col(j);
+arma::mat Z(n_ind, (p_d + 1));
+for(int j = 0; j < (p_d + 1); ++j){
+  Z.col(j) = exposure*poly(j);
   }
 
 Rcpp::List fit_info = neg_two_loglike_update(y,
@@ -277,31 +280,32 @@ for(int j = 1; j < mcmc_samples; ++j){
    eta.col(j) = eta_update(x,
                            off_set,
                            n_ind,
-                           p_q,
+                           p_d,
                            sigma2_eta,
                            omega,
                            lambda,
                            beta.col(j),
                            Z);
-   theta.col(j) = q*eta.col(j);
+   theta.col(j) = dot(poly, eta.col(j));
    
    //radius Update
    Rcpp::List radius_output = radius_update(radius_range,
                                             exposure_definition_indicator,
                                             v_exposure_dists,
-                                            p_q,
+                                            p_d,
                                             n_ind,
                                             m,
                                             m_max,
                                             x,
-                                            q,
                                             off_set,
                                             omega,
                                             lambda,
                                             beta.col(j),
                                             eta.col(j),
                                             radius(j-1),
+                                            theta.col(j),
                                             radius_trans,
+                                            poly,
                                             exposure,
                                             Z,
                                             metrop_var_radius,
@@ -309,9 +313,11 @@ for(int j = 1; j < mcmc_samples; ++j){
    
    radius(j) = Rcpp::as<double>(radius_output[0]);
    acctot_radius = Rcpp::as<int>(radius_output[1]);
-   radius_trans = Rcpp::as<double>(radius_output[2]);
-   exposure = Rcpp::as<arma::vec>(radius_output[3]);
-   Z = Rcpp::as<arma::mat>(radius_output[4]);
+   theta.col(j) = Rcpp::as<arma::vec>(radius_output[2]);
+   radius_trans = Rcpp::as<double>(radius_output[3]);
+   poly = Rcpp::as<arma::vec>(radius_output[4]);
+   exposure = Rcpp::as<arma::vec>(radius_output[5]);
+   Z = Rcpp::as<arma::mat>(radius_output[6]);
    
    if(likelihood_indicator == 2){
      
