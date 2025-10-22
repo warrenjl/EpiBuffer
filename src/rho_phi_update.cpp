@@ -30,6 +30,7 @@ Rcpp::List rho_phi_update(arma::vec radius_range,
                           arma::vec eta,
                           arma::vec gamma,
                           arma::vec radius,
+                          double tau_phi,
                           double rho_phi_old,
                           arma::vec radius_trans,
                           arma::vec phi_star,
@@ -55,7 +56,7 @@ arma::mat Z_old = Z;
 
 double denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
                0.50*phi_star_log_deter_corr_inv_old + 
-               -0.50*dot(phi_star, (phi_star_corr_inv_old*phi_star)) +
+               -0.50*dot(phi_star, (phi_star_corr_inv_old*phi_star))/pow(tau_phi, 2.00) +
                a_rho_phi*rho_phi_trans_old +
                -b_rho_phi*exp(rho_phi_trans_old);
 
@@ -133,7 +134,7 @@ for(int j = 0; j < p_q; ++j){
    } 
 double numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
                0.50*phi_star_log_deter_corr_inv + 
-               -0.50*dot(phi_star, (phi_star_corr_inv*phi_star)) +
+               -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi, 2.00) +
                a_rho_phi*rho_phi_trans +
                -b_rho_phi*exp(rho_phi_trans);
 

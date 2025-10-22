@@ -331,7 +331,7 @@ for(int j = 1; j < mcmc_samples; ++j){
      double completion = round(100*((j + 1)/(double)mcmc_samples));
      Rcpp::Rcout << "Progress: " << completion << "%" << std::endl;
      
-     Rcpp::Rcout << "**********************" << std::endl;
+     Rcpp::Rcout << "**************" << std::endl;
     
      }
    

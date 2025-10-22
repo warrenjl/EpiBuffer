@@ -412,6 +412,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 eta.col(j),
                                                 gamma.col(j),
                                                 radius.col(j),
+                                                tau_phi(j-1),
                                                 radius_trans,
                                                 phi_star,
                                                 phi_tilde,
@@ -466,6 +467,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               eta.col(j),
                                               gamma.col(j),
                                               radius.col(j),
+                                              tau_phi(j),
                                               rho_phi(j-1),
                                               radius_trans,
                                               phi_star,
@@ -556,6 +558,9 @@ for(int j = 1; j < mcmc_samples; ++j){
      double accrate_phi_star_max = round(100*(max(acctot_phi_star)/(double)j));
      Rcpp::Rcout << "phi_star Acceptance (max): " << accrate_phi_star_max << "%" << std::endl;
      
+     double accrate_tau_phi = round(100*(acctot_tau_phi/(double)j));
+     Rcpp::Rcout << "tau_phi Acceptance: " << accrate_tau_phi << "%" << std::endl;
+
      double accrate_rho_phi = round(100*(acctot_rho_phi/(double)j));
      Rcpp::Rcout << "rho_phi Acceptance: " << accrate_rho_phi << "%" << std::endl;
      
