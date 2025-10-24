@@ -141,7 +141,74 @@ for(int j = 0; j < n_grid; ++j){
                         acc;
 
    }
-      
+     
+//Center on the fly
+phi_star = phi_star + 
+           -mean(phi_star);
+phi_tilde = C*(phi_star_corr_inv*phi_star);
+arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
+for(int j = 0; j < n_ind; ++j){
+   phi_tilde_full(j) = phi_tilde(v_index(j));
+   }
+radius_trans = (v_w)*gamma +
+               phi_tilde_full;
+Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
+                                                          radius_trans.end());
+Rcpp::NumericVector radius_nv = Rcpp::pnorm(radius_trans_nv,
+                                            0.00,
+                                            1.00,
+                                            true,
+                                            false);
+radius_nv = radius_nv*(radius_range(1) - radius_range(0)) + 
+            radius_range(0); 
+
+radius = arma::vec(Rcpp::as<std::vector<double>>(radius_nv));
+arma::mat radius_mat(n_ind, m); radius_mat.fill(0.00);
+for(int j = 0; j < n_ind; ++ j){
+   radius_mat.row(j).fill(radius(j));
+   }
+
+//Cumulative Counts
+if(exposure_definition_indicator == 0){
+  
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  exposure = arma::sum(numeric_mat,
+                       1);
+  exposure = exposure/m_max;
+  
+  }
+
+//Spherical
+if(exposure_definition_indicator == 1){
+  
+  arma::mat fast = v_exposure_dists/radius_mat;
+  arma::mat corrs = 1.00 +
+                    -1.50*fast +
+                    0.50*pow(fast, 3);
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  arma::mat prod = corrs%numeric_mat;
+  exposure = arma::sum(prod,
+                       1);
+  exposure = exposure/m_max;
+  
+  }
+
+//Presence/Absence
+if(exposure_definition_indicator == 2){
+  
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  exposure = arma::max(numeric_mat,
+                       1);
+  
+  }
+
+for(int j = 0; j < p_q; ++j){
+   Z.col(j) = exposure%q.col(j);
+   } 
+
 return Rcpp::List::create(Rcpp::Named("phi_star") = phi_star,
                           Rcpp::Named("acctot_phi_star") = acctot_phi_star,
                           Rcpp::Named("radius") = radius,
