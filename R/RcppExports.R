@@ -21,8 +21,8 @@ eta_update <- function(x, off_set, n_ind, p_q, sigma2_eta, omega, lambda, beta, 
     .Call(`_EpiBuffer_eta_update`, x, off_set, n_ind, p_q, sigma2_eta, omega, lambda, beta, Z)
 }
 
-gamma_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, p_w, x, q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, radius, radius_trans, phi_tilde, exposure, Z, metrop_var_gamma, acctot_gamma) {
-    .Call(`_EpiBuffer_gamma_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, p_w, x, q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, radius, radius_trans, phi_tilde, exposure, Z, metrop_var_gamma, acctot_gamma)
+gamma_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, radius, radius_trans, phi_tilde, exposure, Z, metrop_var_gamma, acctot_gamma) {
+    .Call(`_EpiBuffer_gamma_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, radius, radius_trans, phi_tilde, exposure, Z, metrop_var_gamma, acctot_gamma)
 }
 
 latent_update <- function(y, x, off_set, tri_als, likelihood_indicator, n_ind, r_old, beta_old, eta_old, Z) {
@@ -33,24 +33,24 @@ neg_two_loglike_update <- function(y, x, off_set, tri_als, likelihood_indicator,
     .Call(`_EpiBuffer_neg_two_loglike_update`, y, x, off_set, tri_als, likelihood_indicator, n_ind, r, sigma2_epsilon, beta, eta, Z)
 }
 
-phi_star_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma, radius, tau_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star) {
-    .Call(`_EpiBuffer_phi_star_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma, radius, tau_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star)
+phi_star_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma, radius, tau_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star) {
+    .Call(`_EpiBuffer_phi_star_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma, radius, tau_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star)
 }
 
 r_update <- function(y, x, off_set, n_ind, a_r, b_r, beta, eta, Z) {
     .Call(`_EpiBuffer_r_update`, y, x, off_set, n_ind, a_r, b_r, beta, eta, Z)
 }
 
-radius_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, x, q, off_set, omega, lambda, beta, eta, radius_old, radius_trans_old, exposure, Z, metrop_var_radius, acctot_radius) {
-    .Call(`_EpiBuffer_radius_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, x, q, off_set, omega, lambda, beta, eta, radius_old, radius_trans_old, exposure, Z, metrop_var_radius, acctot_radius)
+radius_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, x, v_q, off_set, omega, lambda, beta, eta, radius_old, radius_trans_old, exposure, Z, metrop_var_radius, acctot_radius) {
+    .Call(`_EpiBuffer_radius_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, m, m_max, x, v_q, off_set, omega, lambda, beta, eta, radius_old, radius_trans_old, exposure, Z, metrop_var_radius, acctot_radius)
 }
 
 rcpp_pgdraw <- function(b, c) {
     .Call(`_EpiBuffer_rcpp_pgdraw`, b, c)
 }
 
-rho_phi_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, q, v_w, v_index, off_set, dists12, dists22, a_rho_phi, b_rho_phi, omega, lambda, beta, eta, gamma, radius, tau_phi, rho_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_info, C, exposure, Z, metrop_var_rho_phi, acctot_rho_phi) {
-    .Call(`_EpiBuffer_rho_phi_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, q, v_w, v_index, off_set, dists12, dists22, a_rho_phi, b_rho_phi, omega, lambda, beta, eta, gamma, radius, tau_phi, rho_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_info, C, exposure, Z, metrop_var_rho_phi, acctot_rho_phi)
+rho_phi_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, v_q, v_w, v_index, off_set, dists12, dists22, a_rho_phi, b_rho_phi, omega, lambda, beta, eta, gamma, radius, tau_phi, rho_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_info, C, exposure, Z, metrop_var_rho_phi, acctot_rho_phi) {
+    .Call(`_EpiBuffer_rho_phi_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_max, p_w, x, v_q, v_w, v_index, off_set, dists12, dists22, a_rho_phi, b_rho_phi, omega, lambda, beta, eta, gamma, radius, tau_phi, rho_phi_old, radius_trans, phi_star, phi_tilde, phi_star_corr_info, C, exposure, Z, metrop_var_rho_phi, acctot_rho_phi)
 }
 
 sigma2_epsilon_update <- function(y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta_old, eta_old, Z) {

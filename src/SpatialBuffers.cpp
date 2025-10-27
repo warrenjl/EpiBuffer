@@ -55,11 +55,13 @@ double max_dist = dists22.max();
 
 arma::vec v_index(n_ind); v_index.fill(0);
 arma::mat v_exposure_dists(n_ind, m);
+arma::mat v_q(n_ind, p_q);
 arma::mat v_w(n_ind, p_w);
 for(int j = 0; j < n_ind; ++j){
   
    v_index(j) = v(j) - 1;
    v_exposure_dists.row(j) = exposure_dists.row(v_index(j));
+   v_q.row(j) = q.row(v_index(j));
    v_w.row(j) = w.row(v_index(j));
    
    }
@@ -197,7 +199,7 @@ for(int j = 0; j < n_ind; ++ j){
    }
 
 arma::vec exposure(n_ind); exposure.fill(0.00);
-theta.col(0) = q*eta.col(0);
+theta.col(0) = v_q*eta.col(0);
 
 //Determine Max Possible Exposure
 arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
@@ -249,7 +251,7 @@ if(exposure_definition_indicator == 2){
 
 arma::mat Z(n_ind, p_q);
 for(int j = 0; j < p_q; ++j){
-  Z.col(j) = exposure%q.col(j);
+  Z.col(j) = exposure%v_q.col(j);
   }
 
 Rcpp::List fit_info = neg_two_loglike_update(y,
@@ -355,7 +357,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                            lambda,
                            beta.col(j),
                            Z);
-   theta.col(j) = q*eta.col(j);
+   theta.col(j) = v_q*eta.col(j);
    
    //gamma update
    Rcpp::List gamma_output = gamma_update(radius_range,
@@ -367,7 +369,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           m_max,
                                           p_w,
                                           x,
-                                          q,
+                                          v_q,
                                           v_w,
                                           v_index,
                                           off_set,
@@ -402,7 +404,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 m_max,
                                                 p_w,
                                                 x,
-                                                q,
+                                                v_q,
                                                 v_w,
                                                 v_index,
                                                 off_set,
@@ -453,7 +455,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               m_max,
                                               p_w,
                                               x,
-                                              q,
+                                              v_q,
                                               v_w,
                                               v_index,
                                               off_set,

@@ -59,10 +59,12 @@ if(trials.isNotNull()){
 
 arma::vec v_index(n_ind); v_index.fill(0);
 arma::mat v_exposure_dists(n_ind, m);
+arma::mat v_q(n_ind, p_q);
 for(int j = 0; j < n_ind; ++j){
   
   v_index(j) = v(j) - 1;
   v_exposure_dists.row(j) = exposure_dists.row(v_index(j));
+  v_q.row(j) = q.row(v_index(j));
   
   }
   
@@ -120,7 +122,7 @@ if(eta_init.isNotNull()){
 
 arma::mat radius_mat(n_ind, m); radius_mat.fill(radius);
 arma::vec exposure(n_ind); exposure.fill(0.00);
-theta.col(0) = q*eta.col(0);
+theta.col(0) = v_q*eta.col(0);
 
 //Determine Max Possible Exposure
 arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius);
@@ -172,7 +174,7 @@ if(exposure_definition_indicator == 2){
 
 arma::mat Z(n_ind, p_q);
 for(int j = 0; j < p_q; ++j){
-  Z.col(j) = exposure%q.col(j);
+  Z.col(j) = exposure%v_q.col(j);
   }
 
 Rcpp::List fit_info = neg_two_loglike_update(y,
@@ -272,7 +274,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                            lambda,
                            beta.col(j),
                            Z);
-   theta.col(j) = q*eta.col(j);
+   theta.col(j) = v_q*eta.col(j);
    
    if(likelihood_indicator == 2){
      

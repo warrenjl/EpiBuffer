@@ -16,7 +16,7 @@ Rcpp::List phi_star_update(arma::vec radius_range,
                            int m_max,
                            int p_w,
                            arma::mat x,
-                           arma::mat q,
+                           arma::mat v_q,
                            arma::mat v_w,
                            arma::vec v_index,
                            arma::vec off_set,
@@ -118,7 +118,7 @@ for(int j = 0; j < n_grid; ++j){
      }
    
    for(int k = 0; k < p_q; ++k){
-      Z.col(k) = exposure%q.col(k);
+      Z.col(k) = exposure%v_q.col(k);
       } 
    numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
@@ -206,7 +206,7 @@ if(exposure_definition_indicator == 2){
   }
 
 for(int j = 0; j < p_q; ++j){
-   Z.col(j) = exposure%q.col(j);
+   Z.col(j) = exposure%v_q.col(j);
    } 
 
 return Rcpp::List::create(Rcpp::Named("phi_star") = phi_star,

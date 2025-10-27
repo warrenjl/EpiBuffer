@@ -14,7 +14,7 @@ Rcpp::List radius_update(arma::vec radius_range,
                          int m,
                          int m_max,
                          arma::mat x,
-                         arma::mat q,
+                         arma::mat v_q,
                          arma::vec off_set,
                          arma::vec omega,
                          arma::vec lambda,
@@ -79,7 +79,7 @@ if(exposure_definition_indicator == 2){
   }
 
 for(int j = 0; j < p_q; ++j){
-   Z.col(j) = exposure%q.col(j);
+   Z.col(j) = exposure%v_q.col(j);
    }
 
 double numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) + 

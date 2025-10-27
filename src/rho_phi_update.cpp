@@ -16,7 +16,7 @@ Rcpp::List rho_phi_update(arma::vec radius_range,
                           int m_max,
                           int p_w,
                           arma::mat x,
-                          arma::mat q,
+                          arma::mat v_q,
                           arma::mat v_w,
                           arma::vec v_index,
                           arma::vec off_set,
@@ -130,7 +130,7 @@ if(exposure_definition_indicator == 2){
   }
 
 for(int j = 0; j < p_q; ++j){
-   Z.col(j) = exposure%q.col(j);
+   Z.col(j) = exposure%v_q.col(j);
    } 
 double numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
                0.50*phi_star_log_deter_corr_inv + 
