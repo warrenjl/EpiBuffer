@@ -202,15 +202,12 @@ arma::vec exposure(n_ind); exposure.fill(0.00);
 theta.col(0) = v_q*eta.col(0);
 
 //Determine Max Possible Exposure
-arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(radius_range(1));
+arma::mat radius_max_mat(n_ind, m); radius_max_mat.fill(sum(radius_range)/2.00);
 arma::umat comparison_max = ((v_exposure_dists) < radius_max_mat);
 arma::mat numeric_max_mat = arma::conv_to<arma::mat>::from(comparison_max);
 arma::vec exposure_max = arma::sum(numeric_max_mat,
                                    1);
-double m_max = max(exposure_max);
-if(exposure_definition_indicator == 2){
-  m_max = 1;  
-  }
+double m_sd = stddev(exposure_max);
 
 //Cumulative Counts
 if(exposure_definition_indicator == 0){
@@ -219,7 +216,7 @@ if(exposure_definition_indicator == 0){
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
-  exposure = exposure/m_max;
+  exposure = exposure/m_sd;
   
   }
 
@@ -235,7 +232,7 @@ if(exposure_definition_indicator == 1){
   arma::mat prod = corrs%numeric_mat;
   exposure = arma::sum(prod,
                        1);
-  exposure = exposure/m_max;
+  exposure = exposure/m_sd;
   
   }
 
@@ -246,6 +243,7 @@ if(exposure_definition_indicator == 2){
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::max(numeric_mat,
                        1);
+  exposure = exposure/m_sd;
   
   }
 
@@ -366,7 +364,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           p_q,
                                           n_ind,
                                           m,
-                                          m_max,
+                                          m_sd,
                                           p_w,
                                           x,
                                           v_q,
@@ -401,7 +399,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 n_ind,
                                                 n_grid,
                                                 m,
-                                                m_max,
+                                                m_sd,
                                                 p_w,
                                                 x,
                                                 v_q,
@@ -452,7 +450,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               n_ind,
                                               n_grid,
                                               m,
-                                              m_max,
+                                              m_sd,
                                               p_w,
                                               x,
                                               v_q,
@@ -573,7 +571,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    }
      
 if(waic_info_ind == 0){                             
-  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_max,
+  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_sd,
                             Rcpp::Named("r") = r,
                             Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
                             Rcpp::Named("beta") = beta,
@@ -587,7 +585,7 @@ if(waic_info_ind == 0){
   }
 
 if(waic_info_ind == 1){                             
-  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_max,
+  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_sd,
                             Rcpp::Named("r") = r,
                             Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
                             Rcpp::Named("beta") = beta,
