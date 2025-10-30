@@ -13,7 +13,7 @@ Rcpp::List rho_phi_update(arma::vec radius_range,
                           int n_ind,
                           int n_grid,
                           int m,
-                          int m_max,
+                          int m_sd,
                           int p_w,
                           arma::mat x,
                           arma::mat v_q,
@@ -99,23 +99,35 @@ if(exposure_definition_indicator == 0){
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::sum(numeric_mat,
                        1);
-  exposure = exposure/m_max;
+  exposure = exposure/m_sd;
   
   }
 
 //Spherical
 if(exposure_definition_indicator == 1){
   
-  arma::mat fast = v_exposure_dists/radius_mat;
-  arma::mat corrs = 1.00 +
-                    -1.50*fast +
-                    0.50*pow(fast, 3);
-  arma::umat comparison = ((v_exposure_dists) < radius_mat);
-  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
-  arma::mat prod = corrs%numeric_mat;
-  exposure = arma::sum(prod,
-                       1);
-  exposure = exposure/m_max;
+  arma::vec exposure_tmp(v_exposure_dists.n_rows, arma::fill::zeros);
+  for(arma::uword i = 0; i < v_exposure_dists.n_rows; ++i){
+    
+     double sum_val = 0.0;
+     for(arma::uword j = 0; j < v_exposure_dists.n_cols; ++j){
+      
+        double dist = v_exposure_dists(i,j);
+        double rad = radius_mat(i,j);
+      
+        if(dist < rad){
+        
+          double fast = dist/rad;
+          double fast3 = fast*fast*fast;
+          sum_val += 1.0 - 1.5*fast + 0.5*fast3;
+        
+          }
+      
+        }
+     exposure_tmp(i) = sum_val;
+    
+     }
+  exposure = exposure_tmp/m_sd;
   
   }
 
