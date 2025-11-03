@@ -7,6 +7,8 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 
 Rcpp::List tau_phi_update(int n_grid,
+                          int p_w,
+                          arma::vec gamma,
                           double tau_phi_old,
                           arma::vec phi_star,
                           arma::mat phi_star_corr_inv,
@@ -18,6 +20,8 @@ double tau_phi_trans_old = log(tau_phi_old/(1.00 - tau_phi_old));
 
 double denom = -n_grid*log(tau_phi_old) + 
                -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00) +
+               -0.50*p_w*log(1.00 - tau_phi_old*tau_phi_old) + 
+               -(p_w/(2.00*(1.00 - tau_phi_old*tau_phi_old)))*arma::dot(gamma, gamma) +
                -tau_phi_trans_old +
                -2.00*log(1.00 + exp(-tau_phi_trans_old));
 
@@ -28,6 +32,8 @@ double tau_phi = 1.00/(1.00 + exp(-tau_phi_trans));
 
 double numer = -n_grid*log(tau_phi) + 
                -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi, 2.00) +
+               -0.50*p_w*log(1.00 - tau_phi*tau_phi) + 
+               -(p_w/(2.00*(1.00 - tau_phi*tau_phi)))*arma::dot(gamma, gamma) +
                -tau_phi_trans +
                -2.00*log(1.00 + exp(-tau_phi_trans));
 

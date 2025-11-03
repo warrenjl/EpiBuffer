@@ -286,9 +286,9 @@ if(waic_info_ind == 1){
 
 //Metropolis Settings
 arma::vec acctot_gamma(p_w); acctot_gamma.fill(0);
-arma::vec acctot_phi_star(n_grid); acctot_phi_star.fill(0);
 int acctot_tau_phi = 0;
 int acctot_rho_phi = 0;
+arma::vec acctot_phi_star(n_grid); acctot_phi_star.fill(0);
 
 //Main Sampling Loop
 arma::vec omega(n_ind); omega.fill(0.00);
@@ -388,6 +388,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           beta.col(j), 
                                           eta.col(j),
                                           gamma.col(j-1),
+                                          tau_phi(j-1),
                                           radius.col(j-1),
                                           radius_trans,
                                           phi_tilde,
@@ -423,8 +424,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 beta.col(j), 
                                                 eta.col(j),
                                                 gamma.col(j),
-                                                radius.col(j),
                                                 tau_phi(j-1),
+                                                radius.col(j),
                                                 radius_trans,
                                                 phi_star,
                                                 phi_tilde,
@@ -445,6 +446,8 @@ for(int j = 1; j < mcmc_samples; ++j){
    
    //tau_phi Update
    Rcpp::List tau_phi_output = tau_phi_update(n_grid,
+                                              p_w,
+                                              gamma.col(j),
                                               tau_phi(j-1),
                                               phi_star,
                                               phi_star_corr_info[0],
@@ -478,9 +481,9 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               beta.col(j), 
                                               eta.col(j),
                                               gamma.col(j),
-                                              radius.col(j),
                                               tau_phi(j),
                                               rho_phi(j-1),
+                                              radius.col(j),
                                               radius_trans,
                                               phi_star,
                                               phi_tilde,
