@@ -596,7 +596,11 @@ if(waic_info_ind == 0){
                             Rcpp::Named("theta") = theta,
                             Rcpp::Named("tau_phi") = tau_phi,
                             Rcpp::Named("rho_phi") = rho_phi,
-                            Rcpp::Named("neg_two_loglike") = neg_two_loglike);
+                            Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("acctot_gamma") = acctot_gamma,
+                            Rcpp::Named("acctot_phi_star") = acctot_phi_star,
+                            Rcpp::Named("acctot_tau_phi") = acctot_tau_phi,
+                            Rcpp::Named("acctot_rho_phi") = acctot_rho_phi);
   }
 
 if(waic_info_ind == 1){                             
@@ -611,6 +615,10 @@ if(waic_info_ind == 1){
                             Rcpp::Named("tau_phi") = tau_phi,
                             Rcpp::Named("rho_phi") = rho_phi,
                             Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("acctot_gamma") = acctot_gamma,
+                            Rcpp::Named("acctot_phi_star") = acctot_phi_star,
+                            Rcpp::Named("acctot_tau_phi") = acctot_tau_phi,
+                            Rcpp::Named("acctot_rho_phi") = acctot_rho_phi,
                             Rcpp::Named("log_density") = log_density);
   }
 

@@ -399,7 +399,8 @@ if(waic_info_ind == 0){
                             Rcpp::Named("eta") = eta,
                             Rcpp::Named("radius") = radius,
                             Rcpp::Named("theta") = theta,
-                            Rcpp::Named("neg_two_loglike") = neg_two_loglike);
+                            Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("acctot_radius") = acctot_radius);
   }
 
 if(waic_info_ind == 1){
@@ -411,6 +412,7 @@ if(waic_info_ind == 1){
                             Rcpp::Named("radius") = radius,
                             Rcpp::Named("theta") = theta,
                             Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("acctot_radius") = acctot_radius,
                             Rcpp::Named("log_density") = log_density);
   }
 
