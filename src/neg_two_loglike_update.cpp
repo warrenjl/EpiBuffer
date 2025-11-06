@@ -62,7 +62,8 @@ if(likelihood_indicator == 2){
 double neg_two_loglike = -2.00*sum(log_density);
 
 return Rcpp::List::create(Rcpp::Named("neg_two_loglike") = neg_two_loglike,
-                          Rcpp::Named("log_density") = log_density);
+                          Rcpp::Named("log_density") = log_density,
+                          Rcpp::Named("fitted") = mu);
 
 }
 

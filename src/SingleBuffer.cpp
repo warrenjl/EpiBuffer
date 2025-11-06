@@ -17,6 +17,7 @@ Rcpp::List SingleBuffer(int mcmc_samples,
                         double metrop_var_radius,
                         int likelihood_indicator,
                         Rcpp::Nullable<int> waic_info_indicator = R_NilValue,
+                        Rcpp::Nullable<int> fitted_info_indicator = R_NilValue,
                         Rcpp::Nullable<Rcpp::NumericVector> offset = R_NilValue,
                         Rcpp::Nullable<Rcpp::NumericVector> trials = R_NilValue,
                         Rcpp::Nullable<double> a_r_prior = R_NilValue,
@@ -40,6 +41,10 @@ int waic_info_ind = 0;  //No by Default
 if(waic_info_indicator.isNotNull()){
   waic_info_ind = Rcpp::as<int>(waic_info_indicator);
   }
+int fitted_info_ind = 0;  //No by Default
+if(fitted_info_indicator.isNotNull()){
+  fitted_info_ind = Rcpp::as<int>(fitted_info_indicator);
+  }
 
 arma::vec r(mcmc_samples); r.fill(0.00);
 arma::vec sigma2_epsilon(mcmc_samples); sigma2_epsilon.fill(0.00);
@@ -49,6 +54,7 @@ arma::vec radius(mcmc_samples); radius.fill(0.00);
 arma::mat theta(n_ind, mcmc_samples); theta.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
 arma::mat log_density;
+arma::mat fitted;
 
 arma::vec off_set(n_ind); off_set.fill(0.00);
 if(offset.isNotNull()){
@@ -214,6 +220,12 @@ if(waic_info_ind == 1){
   log_density.col(0) = Rcpp::as<arma::vec>(fit_info[1]);
   
   }
+if(fitted_info_ind == 1){
+  
+  fitted = arma::mat(n_ind, mcmc_samples); fitted.fill(0.00);
+  fitted.col(0) = Rcpp::as<arma::vec>(fit_info[2]);
+  
+  }
 
 //Metropolis Settings
 int acctot_radius = 0;
@@ -371,7 +383,10 @@ for(int j = 1; j < mcmc_samples; ++j){
    if(waic_info_ind == 1){
      log_density.col(j) = Rcpp::as<arma::vec>(fit_info[1]);
      }
-  
+   if(fitted_info_ind == 1){
+     fitted.col(j) = Rcpp::as<arma::vec>(fit_info[2]);
+     }
+   
   //Progress
    if((j + 1) % 10 == 0){ 
      Rcpp::checkUserInterrupt();
@@ -391,7 +406,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    
    }
 
-if(waic_info_ind == 0){
+if((waic_info_ind == 0) & (fitted_info_ind == 0)){
   return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_sd,
                             Rcpp::Named("r") = r,
                             Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
@@ -403,7 +418,7 @@ if(waic_info_ind == 0){
                             Rcpp::Named("acctot_radius") = acctot_radius);
   }
 
-if(waic_info_ind == 1){
+if((waic_info_ind == 1) & (fitted_info_ind == 0)){
   return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_sd,
                             Rcpp::Named("r") = r,
                             Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
@@ -414,6 +429,33 @@ if(waic_info_ind == 1){
                             Rcpp::Named("neg_two_loglike") = neg_two_loglike,
                             Rcpp::Named("acctot_radius") = acctot_radius,
                             Rcpp::Named("log_density") = log_density);
+  }
+
+if((waic_info_ind == 0) & (fitted_info_ind == 1)){
+  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_sd,
+                            Rcpp::Named("r") = r,
+                            Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
+                            Rcpp::Named("beta") = beta,
+                            Rcpp::Named("eta") = eta,
+                            Rcpp::Named("radius") = radius,
+                            Rcpp::Named("theta") = theta,
+                            Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("acctot_radius") = acctot_radius,
+                            Rcpp::Named("fitted") = fitted);
+  }
+
+if((waic_info_ind == 1) & (fitted_info_ind == 1)){
+  return Rcpp::List::create(Rcpp::Named("exposure_scale") = m_sd,
+                            Rcpp::Named("r") = r,
+                            Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
+                            Rcpp::Named("beta") = beta,
+                            Rcpp::Named("eta") = eta,
+                            Rcpp::Named("radius") = radius,
+                            Rcpp::Named("theta") = theta,
+                            Rcpp::Named("neg_two_loglike") = neg_two_loglike,
+                            Rcpp::Named("acctot_radius") = acctot_radius,
+                            Rcpp::Named("log_density") = log_density,
+                            Rcpp::Named("fitted") = fitted);
   }
 
 return R_NilValue;
