@@ -126,6 +126,7 @@ for(int j = 0; j < n_grid; ++j){
      arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
      exposure = arma::max(numeric_mat,
                           1);
+     exposure = exposure/m_sd;
      
      }
    
@@ -226,6 +227,7 @@ if(exposure_definition_indicator == 2){
   arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
   exposure = arma::max(numeric_mat,
                        1);
+  exposure = exposure/m_sd;
   
   }
 
