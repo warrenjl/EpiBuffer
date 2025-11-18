@@ -129,7 +129,7 @@ if(eta_init.isNotNull()){
   eta.col(0) = Rcpp::as<arma::vec>(eta_init);
   }
 
-radius(0) = (radius_range(1) - radius_range(0))/2.00;
+radius(0) = (radius_range(1) + radius_range(0))/2.00;
 if(radius_init.isNotNull()){
   radius(0) = Rcpp::as<double>(radius_init);
   }
