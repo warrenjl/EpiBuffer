@@ -28,7 +28,7 @@ arma::vec prob(n_ind); prob.fill(0.00);
 
 if(likelihood_indicator == 0){
   
-  arma::vec probs = exp(mu)/(1.00 + exp(mu));
+  arma::vec probs = 1.00/(1.00 + exp(-mu));
   for(int j = 0; j < n_ind; ++j){
      log_density(j) = R::dbinom(y(j),
                                 tri_als(j),
@@ -49,7 +49,7 @@ if(likelihood_indicator == 1){
 
 if(likelihood_indicator == 2){
   
-  arma::vec probs = exp(mu)/(1.00 + exp(mu));
+  arma::vec probs = 1.00/(1.00 + exp(-mu));
   for(int j = 0; j < n_ind; ++j){
      log_density(j) = R::dnbinom(y(j), 
                                  r, 
