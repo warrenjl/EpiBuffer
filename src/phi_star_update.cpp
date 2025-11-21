@@ -22,8 +22,8 @@ Rcpp::List phi_star_update(arma::vec radius_range,
                            arma::vec off_set,
                            arma::vec omega,
                            arma::vec lambda,
-                           arma::vec beta, 
-                           arma::vec eta,
+                           arma::vec beta_old, 
+                           arma::vec eta_old,
                            arma::vec gamma_old,
                            double tau_phi_old,
                            arma::vec radius,
@@ -50,7 +50,7 @@ for(int j = 0; j < n_grid; ++j){
    arma::vec exposure_old = exposure;
    arma::mat Z_old = Z;
    
-   denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
+   denom = -0.50*dot((lambda - off_set - x*beta_old - Z_old*eta_old), (omega%(lambda - off_set - x*beta_old - Z_old*eta_old))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
    
    //First
@@ -133,7 +133,7 @@ for(int j = 0; j < n_grid; ++j){
    for(int k = 0; k < p_q; ++k){
       Z.col(k) = exposure%v_q.col(k);
       } 
-   numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
+   numer = -0.50*dot((lambda - off_set - x*beta_old - Z*eta_old), (omega%(lambda - off_set - x*beta_old - Z*eta_old))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
            
    //Decision

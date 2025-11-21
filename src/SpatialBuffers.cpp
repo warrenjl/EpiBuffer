@@ -325,12 +325,12 @@ if(likelihood_indicator == 2){
 for(int j = 1; j < mcmc_samples; ++j){
    
    if(likelihood_indicator == 1){
-  
+     
      //sigma2_epsilon Update
      sigma2_epsilon(j) = sigma2_epsilon_update(y,
                                                x,
                                                off_set,
-                                               n_ind,
+                                               n_ind, 
                                                a_sigma2_epsilon,
                                                b_sigma2_epsilon,
                                                beta.col(j-1),
@@ -339,9 +339,9 @@ for(int j = 1; j < mcmc_samples; ++j){
      omega.fill(1.00/sigma2_epsilon(j));
      
      }
-    
+   
    if(likelihood_indicator == 0){
-    
+     
      //latent parameters Update
      Rcpp::List latent_output = latent_update(y,
                                               x,
@@ -357,29 +357,6 @@ for(int j = 1; j < mcmc_samples; ++j){
      lambda = Rcpp::as<arma::vec>(latent_output[1]);
      
      }
-  
-   //beta Update
-   beta.col(j) = beta_update(x,
-                             off_set,
-                             n_ind,
-                             p_x,
-                             sigma2_beta,
-                             omega,
-                             lambda,
-                             eta.col(j-1),
-                             Z);
-   
-   //eta Update
-   eta.col(j) = eta_update(x,
-                           off_set,
-                           n_ind,
-                           p_q,
-                           sigma2_eta,
-                           omega,
-                           lambda,
-                           beta.col(j),
-                           Z);
-   theta.col(j) = v_q*eta.col(j);
    
    //phi_star Update
    Rcpp::List phi_star_output = phi_star_update(radius_range,
@@ -398,8 +375,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 off_set,
                                                 omega,
                                                 lambda,
-                                                beta.col(j), 
-                                                eta.col(j),
+                                                beta.col(j-1), 
+                                                eta.col(j-1),
                                                 gamma.col(j-1),
                                                 tau_phi(j-1),
                                                 radius.col(j-1),
@@ -437,8 +414,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           off_set,
                                           omega,
                                           lambda,
-                                          beta.col(j), 
-                                          eta.col(j),
+                                          beta.col(j-1), 
+                                          eta.col(j-1),
                                           gamma.col(j-1),
                                           tau_phi(j-1),
                                           radius.col(j),
@@ -490,8 +467,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               b_rho_phi,
                                               omega,
                                               lambda,
-                                              beta.col(j), 
-                                              eta.col(j),
+                                              beta.col(j-1), 
+                                              eta.col(j-1),
                                               gamma.col(j),
                                               tau_phi(j),
                                               rho_phi(j-1),
@@ -515,6 +492,29 @@ for(int j = 1; j < mcmc_samples; ++j){
    C = Rcpp::as<arma::mat>(rho_phi_output[6]);
    exposure = Rcpp::as<arma::vec>(rho_phi_output[7]);
    Z = Rcpp::as<arma::mat>(rho_phi_output[8]);
+   
+   //beta Update
+   beta.col(j) = beta_update(x,
+                             off_set,
+                             n_ind,
+                             p_x,
+                             sigma2_beta,
+                             omega,
+                             lambda,
+                             eta.col(j-1),
+                             Z);
+   
+   //eta Update
+   eta.col(j) = eta_update(x,
+                           off_set,
+                           n_ind,
+                           p_q,
+                           sigma2_eta,
+                           omega,
+                           lambda,
+                           beta.col(j),
+                           Z);
+   theta.col(j) = v_q*eta.col(j);
    
    if(likelihood_indicator == 2){
      
