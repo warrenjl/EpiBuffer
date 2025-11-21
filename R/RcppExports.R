@@ -33,8 +33,8 @@ neg_two_loglike_update <- function(y, x, off_set, tri_als, likelihood_indicator,
     .Call(`_EpiBuffer_neg_two_loglike_update`, y, x, off_set, tri_als, likelihood_indicator, n_ind, r, sigma2_epsilon, beta, eta, Z)
 }
 
-phi_star_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_sd, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma, tau_phi_old, radius, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star) {
-    .Call(`_EpiBuffer_phi_star_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_sd, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma, tau_phi_old, radius, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star)
+phi_star_update <- function(radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_sd, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, tau_phi_old, radius, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star) {
+    .Call(`_EpiBuffer_phi_star_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_sd, p_w, x, v_q, v_w, v_index, off_set, omega, lambda, beta, eta, gamma_old, tau_phi_old, radius, radius_trans, phi_star, phi_tilde, phi_star_corr_inv, C, exposure, Z, metrop_var_phi_star, acctot_phi_star)
 }
 
 r_update <- function(y, x, off_set, n_ind, a_r, b_r, beta, eta, Z) {

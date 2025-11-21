@@ -381,6 +381,46 @@ for(int j = 1; j < mcmc_samples; ++j){
                            Z);
    theta.col(j) = v_q*eta.col(j);
    
+   //phi_star Update
+   Rcpp::List phi_star_output = phi_star_update(radius_range,
+                                                exposure_definition_indicator,
+                                                v_exposure_dists,
+                                                p_q,
+                                                n_ind,
+                                                n_grid,
+                                                m,
+                                                m_sd,
+                                                p_w,
+                                                x,
+                                                v_q,
+                                                v_w,
+                                                v_index,
+                                                off_set,
+                                                omega,
+                                                lambda,
+                                                beta.col(j), 
+                                                eta.col(j),
+                                                gamma.col(j-1),
+                                                tau_phi(j-1),
+                                                radius.col(j-1),
+                                                radius_trans,
+                                                phi_star,
+                                                phi_tilde,
+                                                phi_star_corr_info[0],
+                                                C,
+                                                exposure,
+                                                Z,
+                                                metrop_var_phi_star,
+                                                acctot_phi_star);
+   
+   phi_star = Rcpp::as<arma::vec>(phi_star_output[0]);
+   acctot_phi_star = Rcpp::as<arma::vec>(phi_star_output[1]);
+   radius.col(j) = Rcpp::as<arma::vec>(phi_star_output[2]);
+   radius_trans = Rcpp::as<arma::vec>(phi_star_output[3]);
+   phi_tilde = Rcpp::as<arma::vec>(phi_star_output[4]);
+   exposure = Rcpp::as<arma::vec>(phi_star_output[5]);
+   Z = Rcpp::as<arma::mat>(phi_star_output[6]);
+   
    //gamma update
    Rcpp::List gamma_output = gamma_update(radius_range,
                                           exposure_definition_indicator,
@@ -401,7 +441,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           eta.col(j),
                                           gamma.col(j-1),
                                           tau_phi(j-1),
-                                          radius.col(j-1),
+                                          radius.col(j),
                                           radius_trans,
                                           phi_tilde,
                                           exposure,
@@ -415,46 +455,6 @@ for(int j = 1; j < mcmc_samples; ++j){
    radius_trans = Rcpp::as<arma::vec>(gamma_output[3]);
    exposure = Rcpp::as<arma::vec>(gamma_output[4]);
    Z = Rcpp::as<arma::mat>(gamma_output[5]);
-   
-   //phi_star Update
-   Rcpp::List phi_star_output = phi_star_update(radius_range,
-                                                exposure_definition_indicator,
-                                                v_exposure_dists,
-                                                p_q,
-                                                n_ind,
-                                                n_grid,
-                                                m,
-                                                m_sd,
-                                                p_w,
-                                                x,
-                                                v_q,
-                                                v_w,
-                                                v_index,
-                                                off_set,
-                                                omega,
-                                                lambda,
-                                                beta.col(j), 
-                                                eta.col(j),
-                                                gamma.col(j),
-                                                tau_phi(j-1),
-                                                radius.col(j),
-                                                radius_trans,
-                                                phi_star,
-                                                phi_tilde,
-                                                phi_star_corr_info[0],
-                                                C,
-                                                exposure,
-                                                Z,
-                                                metrop_var_phi_star,
-                                                acctot_phi_star);
-   
-   phi_star = Rcpp::as<arma::vec>(phi_star_output[0]);
-   acctot_phi_star = Rcpp::as<arma::vec>(phi_star_output[1]);
-   radius.col(j) = Rcpp::as<arma::vec>(phi_star_output[2]);
-   radius_trans = Rcpp::as<arma::vec>(phi_star_output[3]);
-   phi_tilde = Rcpp::as<arma::vec>(phi_star_output[4]);
-   exposure = Rcpp::as<arma::vec>(phi_star_output[5]);
-   Z = Rcpp::as<arma::mat>(phi_star_output[6]);
    
    //tau_phi Update
    Rcpp::List tau_phi_output = tau_phi_update(n_grid,
