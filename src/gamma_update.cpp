@@ -12,7 +12,7 @@ Rcpp::List gamma_update(arma::vec radius_range,
                         int p_q,
                         int n_ind,
                         int m,
-                        int m_sd,
+                        double m_sd,
                         int p_w,
                         arma::mat x,
                         arma::mat v_q,
@@ -120,6 +120,7 @@ for(int j = 0; j < p_w; ++j){
      arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
      exposure = arma::max(numeric_mat,
                           1);
+     exposure = exposure/m_sd;
        
      }
      
