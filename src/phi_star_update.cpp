@@ -22,9 +22,9 @@ Rcpp::List phi_star_update(arma::vec radius_range,
                            arma::vec off_set,
                            arma::vec omega,
                            arma::vec lambda,
-                           arma::vec beta, 
-                           arma::vec eta,
-                           arma::vec gamma,
+                           arma::vec beta_old, 
+                           arma::vec eta_old,
+                           arma::vec gamma_old,
                            double tau_phi_old,
                            arma::vec radius,
                            arma::vec radius_trans,
@@ -50,7 +50,7 @@ for(int j = 0; j < n_grid; ++j){
    arma::vec exposure_old = exposure;
    arma::mat Z_old = Z;
    
-   denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
+   denom = -0.50*dot((lambda - off_set - x*beta_old - Z_old*eta_old), (omega%(lambda - off_set - x*beta_old - Z_old*eta_old))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
    
    //First
@@ -62,7 +62,7 @@ for(int j = 0; j < n_grid; ++j){
    for(int k = 0; k < n_ind; ++k){
      phi_tilde_full(k) = phi_tilde(v_index(k));
      }
-   radius_trans = (v_w)*gamma +
+   radius_trans = (v_w)*gamma_old +
                   phi_tilde_full;
    Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                              radius_trans.end());
@@ -133,7 +133,7 @@ for(int j = 0; j < n_grid; ++j){
    for(int k = 0; k < p_q; ++k){
       Z.col(k) = exposure%v_q.col(k);
       } 
-   numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
+   numer = -0.50*dot((lambda - off_set - x*beta_old - Z*eta_old), (omega%(lambda - off_set - x*beta_old - Z*eta_old))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
            
    //Decision
@@ -156,6 +156,7 @@ for(int j = 0; j < n_grid; ++j){
    }
      
 //Center on the fly
+<<<<<<< HEAD
 //phi_star = phi_star + 
 //           -mean(phi_star);
 //phi_tilde = C*(phi_star_corr_inv*phi_star);
@@ -163,7 +164,7 @@ for(int j = 0; j < n_grid; ++j){
 //for(int j = 0; j < n_ind; ++j){
 //   phi_tilde_full(j) = phi_tilde(v_index(j));
 //   }
-//radius_trans = (v_w)*gamma +
+//radius_trans = (v_w)*gamma_old +
 //               phi_tilde_full;
 //Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
 //                                                          radius_trans.end());
@@ -174,53 +175,81 @@ for(int j = 0; j < n_grid; ++j){
 //                                            false);
 //radius_nv = radius_nv*(radius_range(1) - radius_range(0)) + 
 //            radius_range(0); 
-//
+
 //radius = arma::vec(Rcpp::as<std::vector<double>>(radius_nv));
 //arma::mat radius_mat(n_ind, m); radius_mat.fill(0.00);
 //for(int j = 0; j < n_ind; ++ j){
 //   radius_mat.row(j).fill(radius(j));
 //   }
 //
+=======
+phi_star = phi_star + 
+           -mean(phi_star);
+phi_tilde = C*(phi_star_corr_inv*phi_star);
+arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
+for(int j = 0; j < n_ind; ++j){
+   phi_tilde_full(j) = phi_tilde(v_index(j));
+   }
+radius_trans = (v_w)*gamma_old +
+               phi_tilde_full;
+Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
+                                                          radius_trans.end());
+Rcpp::NumericVector radius_nv = Rcpp::pnorm(radius_trans_nv,
+                                            0.00,
+                                            1.00,
+                                            true,
+                                            false);
+radius_nv = radius_nv*(radius_range(1) - radius_range(0)) + 
+            radius_range(0); 
+
+radius = arma::vec(Rcpp::as<std::vector<double>>(radius_nv));
+arma::mat radius_mat(n_ind, m); radius_mat.fill(0.00);
+for(int j = 0; j < n_ind; ++ j){
+   radius_mat.row(j).fill(radius(j));
+   }
+
+>>>>>>> e4d83ef4e5e5b44f0b2c001dd4a826867003626a
 //Cumulative Counts
-//if(exposure_definition_indicator == 0){
-//  
-//  arma::umat comparison = ((v_exposure_dists) < radius_mat);
-//  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
-//  exposure = arma::sum(numeric_mat,
-//                       1);
-//  exposure = exposure/m_sd;
-//  
-//  }
-//
+if(exposure_definition_indicator == 0){
+  
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  exposure = arma::sum(numeric_mat,
+                       1);
+  exposure = exposure/m_sd;
+  
+  }
+
 //Spherical
-//if(exposure_definition_indicator == 1){
-//  
-//  arma::vec exposure_tmp(v_exposure_dists.n_rows, arma::fill::zeros);
-//  for(arma::uword i = 0; i < v_exposure_dists.n_rows; ++i){
-//    
-//     double sum_val = 0.0;
-//     for(arma::uword j = 0; j < v_exposure_dists.n_cols; ++j){
-//      
-//        double dist = v_exposure_dists(i,j);
-//        double rad = radius_mat(i,j);
-//      
-//        if(dist < rad){
-//        
-//          double fast = dist/rad;
-//          double fast3 = fast*fast*fast;
-//          sum_val += 1.0 - 1.5*fast + 0.5*fast3;
-//        
-//          }
-//      
-//        }
-//     exposure_tmp(i) = sum_val;
-//    
-//     }
-//  exposure = exposure_tmp/m_sd;
-//  
-//  }
-//
+if(exposure_definition_indicator == 1){
+  
+  arma::vec exposure_tmp(v_exposure_dists.n_rows, arma::fill::zeros);
+  for(arma::uword i = 0; i < v_exposure_dists.n_rows; ++i){
+    
+     double sum_val = 0.0;
+     for(arma::uword j = 0; j < v_exposure_dists.n_cols; ++j){
+      
+        double dist = v_exposure_dists(i,j);
+        double rad = radius_mat(i,j);
+      
+        if(dist < rad){
+        
+          double fast = dist/rad;
+          double fast3 = fast*fast*fast;
+          sum_val += 1.0 - 1.5*fast + 0.5*fast3;
+        
+          }
+      
+        }
+     exposure_tmp(i) = sum_val;
+    
+     }
+  exposure = exposure_tmp/m_sd;
+  
+  }
+
 //Presence/Absence
+<<<<<<< HEAD
 //if(exposure_definition_indicator == 2){
 //  
 //  arma::umat comparison = ((v_exposure_dists) < radius_mat);
@@ -234,7 +263,23 @@ for(int j = 0; j < n_grid; ++j){
 //for(int j = 0; j < p_q; ++j){
 //   Z.col(j) = exposure%v_q.col(j);
 //   } 
+//
+=======
+if(exposure_definition_indicator == 2){
+  
+  arma::umat comparison = ((v_exposure_dists) < radius_mat);
+  arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
+  exposure = arma::max(numeric_mat,
+                       1);
+  exposure = exposure/m_sd;
+  
+  }
 
+for(int j = 0; j < p_q; ++j){
+   Z.col(j) = exposure%v_q.col(j);
+   } 
+
+>>>>>>> e4d83ef4e5e5b44f0b2c001dd4a826867003626a
 return Rcpp::List::create(Rcpp::Named("phi_star") = phi_star,
                           Rcpp::Named("acctot_phi_star") = acctot_phi_star,
                           Rcpp::Named("radius") = radius,
