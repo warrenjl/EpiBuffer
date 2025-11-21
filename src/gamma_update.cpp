@@ -12,7 +12,7 @@ Rcpp::List gamma_update(arma::vec radius_range,
                         int p_q,
                         int n_ind,
                         int m,
-                        double m_sd,
+                        int m_sd,
                         int p_w,
                         arma::mat x,
                         arma::mat v_q,
@@ -21,8 +21,8 @@ Rcpp::List gamma_update(arma::vec radius_range,
                         arma::vec off_set,
                         arma::vec omega,
                         arma::vec lambda,
-                        arma::vec beta_old, 
-                        arma::vec eta_old,
+                        arma::vec beta, 
+                        arma::vec eta,
                         arma::vec gamma_old,
                         double tau_phi_old,
                         arma::vec radius,
@@ -46,7 +46,7 @@ for(int j = 0; j < p_w; ++j){
    arma::vec exposure_old = exposure;
    arma::mat Z_old = Z;
    
-   denom = -0.50*dot((lambda - off_set - x*beta_old - Z_old*eta_old), (omega%(lambda - off_set - x*beta_old - Z_old*eta_old))) +
+   denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
             -0.50*p_w*pow(gamma(j), 2)/(1.00 - tau_phi_old*tau_phi_old);
             
    //First
@@ -120,7 +120,6 @@ for(int j = 0; j < p_w; ++j){
      arma::mat numeric_mat = arma::conv_to<arma::mat>::from(comparison);
      exposure = arma::max(numeric_mat,
                           1);
-     exposure = exposure/m_sd;
        
      }
      
@@ -128,7 +127,7 @@ for(int j = 0; j < p_w; ++j){
       Z.col(k) = exposure%v_q.col(k);
       }
    
-   numer = -0.50*dot((lambda - off_set - x*beta_old - Z*eta_old), (omega%(lambda - off_set - x*beta_old - Z*eta_old))) +
+   numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
            -0.50*p_w*pow(gamma(j), 2)/(1.00 - tau_phi_old*tau_phi_old);
       
    /*Decision*/
