@@ -41,8 +41,8 @@ double sigma2_epsilon_update(arma::vec y,
                              int n_ind,
                              double a_sigma2_epsilon,
                              double b_sigma2_epsilon,
-                             arma::vec beta,
-                             arma::vec eta,
+                             arma::vec beta_old,
+                             arma::vec eta_old,
                              arma::mat Z);
 
 arma::vec beta_update(arma::mat x,

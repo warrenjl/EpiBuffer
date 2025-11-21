@@ -385,8 +385,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // sigma2_epsilon_update
-double sigma2_epsilon_update(arma::vec y, arma::mat x, arma::vec off_set, int n_ind, double a_sigma2_epsilon, double b_sigma2_epsilon, arma::vec beta, arma::vec eta, arma::mat Z);
-RcppExport SEXP _EpiBuffer_sigma2_epsilon_update(SEXP ySEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP n_indSEXP, SEXP a_sigma2_epsilonSEXP, SEXP b_sigma2_epsilonSEXP, SEXP betaSEXP, SEXP etaSEXP, SEXP ZSEXP) {
+double sigma2_epsilon_update(arma::vec y, arma::mat x, arma::vec off_set, int n_ind, double a_sigma2_epsilon, double b_sigma2_epsilon, arma::vec beta_old, arma::vec eta_old, arma::mat Z);
+RcppExport SEXP _EpiBuffer_sigma2_epsilon_update(SEXP ySEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP n_indSEXP, SEXP a_sigma2_epsilonSEXP, SEXP b_sigma2_epsilonSEXP, SEXP beta_oldSEXP, SEXP eta_oldSEXP, SEXP ZSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -396,10 +396,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
     Rcpp::traits::input_parameter< double >::type a_sigma2_epsilon(a_sigma2_epsilonSEXP);
     Rcpp::traits::input_parameter< double >::type b_sigma2_epsilon(b_sigma2_epsilonSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type beta_old(beta_oldSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type eta_old(eta_oldSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type Z(ZSEXP);
-    rcpp_result_gen = Rcpp::wrap(sigma2_epsilon_update(y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta, eta, Z));
+    rcpp_result_gen = Rcpp::wrap(sigma2_epsilon_update(y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta_old, eta_old, Z));
     return rcpp_result_gen;
 END_RCPP
 }
