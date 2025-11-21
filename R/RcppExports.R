@@ -53,8 +53,8 @@ rho_phi_update <- function(radius_range, exposure_definition_indicator, v_exposu
     .Call(`_EpiBuffer_rho_phi_update`, radius_range, exposure_definition_indicator, v_exposure_dists, p_q, n_ind, n_grid, m, m_sd, p_w, x, v_q, v_w, v_index, off_set, dists12, dists22, a_rho_phi, b_rho_phi, omega, lambda, beta_old, eta_old, gamma, tau_phi, rho_phi_old, radius, radius_trans, phi_star, phi_tilde, phi_star_corr_info, C, exposure, Z, metrop_var_rho_phi, acctot_rho_phi)
 }
 
-sigma2_epsilon_update <- function(y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta_old, eta_old, Z) {
-    .Call(`_EpiBuffer_sigma2_epsilon_update`, y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta_old, eta_old, Z)
+sigma2_epsilon_update <- function(y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta, eta, Z) {
+    .Call(`_EpiBuffer_sigma2_epsilon_update`, y, x, off_set, n_ind, a_sigma2_epsilon, b_sigma2_epsilon, beta, eta, Z)
 }
 
 spatial_corr_fun <- function(phi, spatial_dists) {

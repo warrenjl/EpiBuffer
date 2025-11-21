@@ -303,8 +303,25 @@ int acctot_rho_phi = 0;
 arma::vec acctot_phi_star(n_grid); acctot_phi_star.fill(0);
 
 //Main Sampling Loop
-arma::vec omega(n_ind); omega.fill(0.00);
+arma::vec omega(n_ind); omega.fill(1.00/sigma2_epsilon(0));
 arma::vec lambda = y;
+if(likelihood_indicator == 0){
+  
+  //latent parameters Update
+  Rcpp::List latent_output = latent_update(y,
+                                           x,
+                                           off_set,
+                                           tri_als,
+                                           likelihood_indicator,
+                                           n_ind,
+                                           r(0),
+                                           beta.col(0),
+                                           eta.col(0),
+                                           Z);
+  omega = Rcpp::as<arma::vec>(latent_output[0]);
+  lambda = Rcpp::as<arma::vec>(latent_output[1]);
+  
+  }
 if(likelihood_indicator == 2){
   
   Rcpp::List latent_output = latent_update(y,
@@ -323,40 +340,6 @@ if(likelihood_indicator == 2){
   }
 
 for(int j = 1; j < mcmc_samples; ++j){
-   
-   if(likelihood_indicator == 1){
-     
-     //sigma2_epsilon Update
-     sigma2_epsilon(j) = sigma2_epsilon_update(y,
-                                               x,
-                                               off_set,
-                                               n_ind, 
-                                               a_sigma2_epsilon,
-                                               b_sigma2_epsilon,
-                                               beta.col(j-1),
-                                               eta.col(j-1),
-                                               Z);
-     omega.fill(1.00/sigma2_epsilon(j));
-     
-     }
-   
-   if(likelihood_indicator == 0){
-     
-     //latent parameters Update
-     Rcpp::List latent_output = latent_update(y,
-                                              x,
-                                              off_set,
-                                              tri_als,
-                                              likelihood_indicator,
-                                              n_ind,
-                                              r(j-1),
-                                              beta.col(j-1),
-                                              eta.col(j-1),
-                                              Z);
-     omega = Rcpp::as<arma::vec>(latent_output[0]);
-     lambda = Rcpp::as<arma::vec>(latent_output[1]);
-     
-     }
    
    //phi_star Update
    Rcpp::List phi_star_output = phi_star_update(radius_range,
@@ -515,6 +498,40 @@ for(int j = 1; j < mcmc_samples; ++j){
                            beta.col(j),
                            Z);
    theta.col(j) = v_q*eta.col(j);
+   
+   if(likelihood_indicator == 0){
+     
+     //latent parameters Update
+     Rcpp::List latent_output = latent_update(y,
+                                              x,
+                                              off_set,
+                                              tri_als,
+                                              likelihood_indicator,
+                                              n_ind,
+                                              r(j-1),
+                                              beta.col(j),
+                                              eta.col(j),
+                                              Z);
+     omega = Rcpp::as<arma::vec>(latent_output[0]);
+     lambda = Rcpp::as<arma::vec>(latent_output[1]);
+     
+     }
+   
+   if(likelihood_indicator == 1){
+     
+     //sigma2_epsilon Update
+     sigma2_epsilon(j) = sigma2_epsilon_update(y,
+                                               x,
+                                               off_set,
+                                               n_ind, 
+                                               a_sigma2_epsilon,
+                                               b_sigma2_epsilon,
+                                               beta.col(j),
+                                               eta.col(j),
+                                               Z);
+     omega.fill(1.00/sigma2_epsilon(j));
+     
+     }
    
    if(likelihood_indicator == 2){
      
