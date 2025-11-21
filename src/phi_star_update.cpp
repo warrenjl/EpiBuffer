@@ -22,9 +22,9 @@ Rcpp::List phi_star_update(arma::vec radius_range,
                            arma::vec off_set,
                            arma::vec omega,
                            arma::vec lambda,
-                           arma::vec beta, 
-                           arma::vec eta,
-                           arma::vec gamma,
+                           arma::vec beta_old, 
+                           arma::vec eta_old,
+                           arma::vec gamma_old,
                            double tau_phi_old,
                            arma::vec radius,
                            arma::vec radius_trans,
@@ -50,7 +50,7 @@ for(int j = 0; j < n_grid; ++j){
    arma::vec exposure_old = exposure;
    arma::mat Z_old = Z;
    
-   denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
+   denom = -0.50*dot((lambda - off_set - x*beta_old - Z_old*eta_old), (omega%(lambda - off_set - x*beta_old - Z_old*eta_old))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
    
    //First
@@ -62,7 +62,7 @@ for(int j = 0; j < n_grid; ++j){
    for(int k = 0; k < n_ind; ++k){
      phi_tilde_full(k) = phi_tilde(v_index(k));
      }
-   radius_trans = (v_w)*gamma +
+   radius_trans = (v_w)*gamma_old +
                   phi_tilde_full;
    Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
                                                              radius_trans.end());
@@ -133,7 +133,7 @@ for(int j = 0; j < n_grid; ++j){
    for(int k = 0; k < p_q; ++k){
       Z.col(k) = exposure%v_q.col(k);
       } 
-   numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
+   numer = -0.50*dot((lambda - off_set - x*beta_old - Z*eta_old), (omega%(lambda - off_set - x*beta_old - Z*eta_old))) +
            -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi_old, 2.00);
            
    //Decision
@@ -163,7 +163,7 @@ for(int j = 0; j < n_grid; ++j){
 //for(int j = 0; j < n_ind; ++j){
 //   phi_tilde_full(j) = phi_tilde(v_index(j));
 //   }
-//radius_trans = (v_w)*gamma +
+//radius_trans = (v_w)*gamma_old +
 //               phi_tilde_full;
 //Rcpp::NumericVector radius_trans_nv = Rcpp::NumericVector(radius_trans.begin(), 
 //                                                          radius_trans.end());
@@ -174,7 +174,7 @@ for(int j = 0; j < n_grid; ++j){
 //                                            false);
 //radius_nv = radius_nv*(radius_range(1) - radius_range(0)) + 
 //            radius_range(0); 
-//
+
 //radius = arma::vec(Rcpp::as<std::vector<double>>(radius_nv));
 //arma::mat radius_mat(n_ind, m); radius_mat.fill(0.00);
 //for(int j = 0; j < n_ind; ++ j){
@@ -234,7 +234,7 @@ for(int j = 0; j < n_grid; ++j){
 //for(int j = 0; j < p_q; ++j){
 //   Z.col(j) = exposure%v_q.col(j);
 //   } 
-
+//
 return Rcpp::List::create(Rcpp::Named("phi_star") = phi_star,
                           Rcpp::Named("acctot_phi_star") = acctot_phi_star,
                           Rcpp::Named("radius") = radius,

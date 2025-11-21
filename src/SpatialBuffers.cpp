@@ -325,12 +325,12 @@ if(likelihood_indicator == 2){
 for(int j = 1; j < mcmc_samples; ++j){
    
    if(likelihood_indicator == 1){
-  
+     
      //sigma2_epsilon Update
      sigma2_epsilon(j) = sigma2_epsilon_update(y,
                                                x,
                                                off_set,
-                                               n_ind,
+                                               n_ind, 
                                                a_sigma2_epsilon,
                                                b_sigma2_epsilon,
                                                beta.col(j-1),
@@ -339,9 +339,9 @@ for(int j = 1; j < mcmc_samples; ++j){
      omega.fill(1.00/sigma2_epsilon(j));
      
      }
-    
+   
    if(likelihood_indicator == 0){
-    
+     
      //latent parameters Update
      Rcpp::List latent_output = latent_update(y,
                                               x,
@@ -357,64 +357,6 @@ for(int j = 1; j < mcmc_samples; ++j){
      lambda = Rcpp::as<arma::vec>(latent_output[1]);
      
      }
-  
-   //beta Update
-   beta.col(j) = beta_update(x,
-                             off_set,
-                             n_ind,
-                             p_x,
-                             sigma2_beta,
-                             omega,
-                             lambda,
-                             eta.col(j-1),
-                             Z);
-   
-   //eta Update
-   eta.col(j) = eta_update(x,
-                           off_set,
-                           n_ind,
-                           p_q,
-                           sigma2_eta,
-                           omega,
-                           lambda,
-                           beta.col(j),
-                           Z);
-   theta.col(j) = v_q*eta.col(j);
-   
-   //gamma update
-   Rcpp::List gamma_output = gamma_update(radius_range,
-                                          exposure_definition_indicator,
-                                          v_exposure_dists,
-                                          p_q,
-                                          n_ind,
-                                          m,
-                                          m_sd,
-                                          p_w,
-                                          x,
-                                          v_q,
-                                          v_w,
-                                          v_index,
-                                          off_set,
-                                          omega,
-                                          lambda,
-                                          beta.col(j), 
-                                          eta.col(j),
-                                          gamma.col(j-1),
-                                          tau_phi(j-1),
-                                          radius.col(j-1),
-                                          radius_trans,
-                                          phi_tilde,
-                                          exposure,
-                                          Z,
-                                          metrop_var_gamma,
-                                          acctot_gamma);
-   
-   gamma.col(j) = Rcpp::as<arma::vec>(gamma_output[0]); 
-   acctot_gamma = Rcpp::as<arma::vec>(gamma_output[1]);
-   radius.col(j) = Rcpp::as<arma::vec>(gamma_output[2]);
-   radius_trans = Rcpp::as<arma::vec>(gamma_output[3]);
-   exposure = Rcpp::as<arma::vec>(gamma_output[4]);
-   Z = Rcpp::as<arma::mat>(gamma_output[5]);
    
    //phi_star Update
    Rcpp::List phi_star_output = phi_star_update(radius_range,
@@ -433,11 +375,11 @@ for(int j = 1; j < mcmc_samples; ++j){
                                                 off_set,
                                                 omega,
                                                 lambda,
-                                                beta.col(j), 
-                                                eta.col(j),
-                                                gamma.col(j),
+                                                beta.col(j-1), 
+                                                eta.col(j-1),
+                                                gamma.col(j-1),
                                                 tau_phi(j-1),
-                                                radius.col(j),
+                                                radius.col(j-1),
                                                 radius_trans,
                                                 phi_star,
                                                 phi_tilde,
@@ -455,6 +397,41 @@ for(int j = 1; j < mcmc_samples; ++j){
    phi_tilde = Rcpp::as<arma::vec>(phi_star_output[4]);
    exposure = Rcpp::as<arma::vec>(phi_star_output[5]);
    Z = Rcpp::as<arma::mat>(phi_star_output[6]);
+   
+   //gamma update
+   Rcpp::List gamma_output = gamma_update(radius_range,
+                                          exposure_definition_indicator,
+                                          v_exposure_dists,
+                                          p_q,
+                                          n_ind,
+                                          m,
+                                          m_sd,
+                                          p_w,
+                                          x,
+                                          v_q,
+                                          v_w,
+                                          v_index,
+                                          off_set,
+                                          omega,
+                                          lambda,
+                                          beta.col(j-1), 
+                                          eta.col(j-1),
+                                          gamma.col(j-1),
+                                          tau_phi(j-1),
+                                          radius.col(j),
+                                          radius_trans,
+                                          phi_tilde,
+                                          exposure,
+                                          Z,
+                                          metrop_var_gamma,
+                                          acctot_gamma);
+   
+   gamma.col(j) = Rcpp::as<arma::vec>(gamma_output[0]); 
+   acctot_gamma = Rcpp::as<arma::vec>(gamma_output[1]);
+   radius.col(j) = Rcpp::as<arma::vec>(gamma_output[2]);
+   radius_trans = Rcpp::as<arma::vec>(gamma_output[3]);
+   exposure = Rcpp::as<arma::vec>(gamma_output[4]);
+   Z = Rcpp::as<arma::mat>(gamma_output[5]);
    
    //tau_phi Update
    Rcpp::List tau_phi_output = tau_phi_update(n_grid,
@@ -490,8 +467,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               b_rho_phi,
                                               omega,
                                               lambda,
-                                              beta.col(j), 
-                                              eta.col(j),
+                                              beta.col(j-1), 
+                                              eta.col(j-1),
                                               gamma.col(j),
                                               tau_phi(j),
                                               rho_phi(j-1),
@@ -515,6 +492,29 @@ for(int j = 1; j < mcmc_samples; ++j){
    C = Rcpp::as<arma::mat>(rho_phi_output[6]);
    exposure = Rcpp::as<arma::vec>(rho_phi_output[7]);
    Z = Rcpp::as<arma::mat>(rho_phi_output[8]);
+   
+   //beta Update
+   beta.col(j) = beta_update(x,
+                             off_set,
+                             n_ind,
+                             p_x,
+                             sigma2_beta,
+                             omega,
+                             lambda,
+                             eta.col(j-1),
+                             Z);
+   
+   //eta Update
+   eta.col(j) = eta_update(x,
+                           off_set,
+                           n_ind,
+                           p_q,
+                           sigma2_eta,
+                           omega,
+                           lambda,
+                           beta.col(j),
+                           Z);
+   theta.col(j) = v_q*eta.col(j);
    
    if(likelihood_indicator == 2){
      

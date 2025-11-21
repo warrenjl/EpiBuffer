@@ -26,8 +26,8 @@ Rcpp::List rho_phi_update(arma::vec radius_range,
                           double b_rho_phi,
                           arma::vec omega,
                           arma::vec lambda,
-                          arma::vec beta, 
-                          arma::vec eta,
+                          arma::vec beta_old, 
+                          arma::vec eta_old,
                           arma::vec gamma,
                           double tau_phi,
                           double rho_phi_old,
@@ -54,7 +54,7 @@ arma::mat C_old = C;
 arma::vec exposure_old = exposure;
 arma::mat Z_old = Z;
 
-double denom = -0.50*dot((lambda - off_set - x*beta - Z_old*eta), (omega%(lambda - off_set - x*beta - Z_old*eta))) +
+double denom = -0.50*dot((lambda - off_set - x*beta_old - Z_old*eta_old), (omega%(lambda - off_set - x*beta_old - Z_old*eta_old))) +
                0.50*phi_star_log_deter_corr_inv_old + 
                -0.50*dot(phi_star, (phi_star_corr_inv_old*phi_star))/pow(tau_phi, 2.00) +
                a_rho_phi*rho_phi_trans_old +
@@ -145,7 +145,7 @@ if(exposure_definition_indicator == 2){
 for(int j = 0; j < p_q; ++j){
    Z.col(j) = exposure%v_q.col(j);
    } 
-double numer = -0.50*dot((lambda - off_set - x*beta - Z*eta), (omega%(lambda - off_set - x*beta - Z*eta))) +
+double numer = -0.50*dot((lambda - off_set - x*beta_old - Z*eta_old), (omega%(lambda - off_set - x*beta_old - Z*eta_old))) +
                0.50*phi_star_log_deter_corr_inv + 
                -0.50*dot(phi_star, (phi_star_corr_inv*phi_star))/pow(tau_phi, 2.00) +
                a_rho_phi*rho_phi_trans +
