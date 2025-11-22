@@ -56,6 +56,8 @@ for(int j = 0; j < n_grid; ++j){
    //First
    phi_star(j) = R::rnorm(phi_star_old(j),
                           sqrt(metrop_var_phi_star(j)));
+   phi_star = phi_star +        //Centering-on-the-fly
+              -mean(phi_star);
    
    phi_tilde = C*(phi_star_corr_inv*phi_star);
    arma::vec phi_tilde_full(n_ind); phi_tilde_full.fill(0.00);
@@ -143,7 +145,7 @@ for(int j = 0; j < n_grid; ++j){
        
      radius = radius_old;
      radius_trans = radius_trans_old;
-     phi_star(j) = phi_star_old(j);
+     phi_star = phi_star_old;
      phi_tilde = phi_tilde_old;
      exposure = exposure_old;
      Z = Z_old;
