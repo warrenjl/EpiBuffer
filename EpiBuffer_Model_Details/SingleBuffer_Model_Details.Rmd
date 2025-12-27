@@ -4,7 +4,7 @@ output:
   word_document: default
   html_document: default
 ---
-# EpiBuffer: Spatially-Varying Buffer Radii Model for Estimating Spatial Heterogeneity in Exposure Buffers and Risk
+# EpiBuffer: Modeling Spatial Heterogeneity in Exposure Buffers and Risk
 
 
 ## SingleBuffer Statistical Model

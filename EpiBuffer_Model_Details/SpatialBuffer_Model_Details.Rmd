@@ -4,7 +4,7 @@ output:
   word_document: default
   html_document: default
 ---
-# EpiBuffer: Spatially-Varying Buffer Radii Model for Estimating Spatial Heterogeneity in Exposure Buffers and Risk
+# EpiBuffer: Modeling Spatial Heterogeneity in Exposure Buffers and Risk
 
 
 ## SpatialBuffers Statistical Model
@@ -13,36 +13,36 @@ $$
 Y_i\left(\textbf{s}_j\right) | \mu_i\left(\textbf{s}_j\right), \boldsymbol{\zeta} \stackrel{\text{ind}}{\sim} f\left(y \mid \mu_i\left(\textbf{s}_j\right), \boldsymbol{\zeta} \right),\ j=1,...,m, \ i=1,...,n_j;
 $$
 $$
-g\{\mu_i(\textbf{s}_j)\} = \text{O}_i(\textbf{s}_j) + \textbf{x}_i(\textbf{s}_j)^{\text{T}} \boldsymbol{\beta} + \text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) \theta\left\{\delta\left(\textbf{s}_j\right)\right\}.
+g\{\mu_i(\textbf{s}_j)\} = \text{O}_i(\textbf{s}_j) + \textbf{x}_i(\textbf{s}_j)^{\text{T}} \boldsymbol{\beta} + \text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} \theta\left(\textbf{s}_j\right).
 $$
 
 ## Likelihood Options
 * Binomial likelihood with logit link function (likelihood_indicator $= 0$): 
 $$
-Y_i(\textbf{s}_j) | p_i(\textbf{s}_j) \stackrel{\text{ind}}{\sim} \text{Binomial}\left(\tilde{n}_i(\textbf{s}_j), p_i(\textbf{s}_j)\right), \text{logit}\left\{p_i(\textbf{s}_j)\right\} = \textbf{x}_i(\textbf{s}_j)^{\text{T}}\boldsymbol{\beta} + \text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) \theta\left\{\delta\left(\textbf{s}_j\right)\right\};
+Y_i(\textbf{s}_j) | p_i(\textbf{s}_j) \stackrel{\text{ind}}{\sim} \text{Binomial}\left(\tilde{n}_i(\textbf{s}_j), p_i(\textbf{s}_j)\right), \text{logit}\left\{p_i(\textbf{s}_j)\right\} = \textbf{x}_i(\textbf{s}_j)^{\text{T}}\boldsymbol{\beta} + \text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} \theta\left(\textbf{s}_j\right);
 $$
 
 * Gaussian likelihood with identity link function (likelihood_indicator $= 1$): 
 $$
-Y_i(\textbf{s}_j) = \textbf{x}_i(\textbf{s}_j)^{\text{T}}\boldsymbol{\beta} + \text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) \theta\left\{\delta\left(\textbf{s}_j\right)\right\} + \epsilon_i,\ \epsilon_i|\sigma^2_{\epsilon} \stackrel{\text{iid}}{\sim}\text{N}\left(0, \sigma^2_{\epsilon}\right);
+Y_i(\textbf{s}_j) = \textbf{x}_i(\textbf{s}_j)^{\text{T}}\boldsymbol{\beta} + \text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} \theta\left(\textbf{s}_j\right) + \epsilon_i,\ \epsilon_i|\sigma^2_{\epsilon} \stackrel{\text{iid}}{\sim}\text{N}\left(0, \sigma^2_{\epsilon}\right);
 $$
 
 * Negative binomial likelihood with logit link function (likelihood_indicator $= 2$): 
 $$
 Y_i(\textbf{s}_j) | r, p_i(\textbf{s}_j) \stackrel{\text{ind}}{\sim} \text{Negative Binomial}\left(r, p_i(\textbf{s}_j)\right),
-\text{logit}\left\{p_i(\textbf{s}_j)\right\} = \text{O}_i(\textbf{s}_j) + \textbf{x}_i(\textbf{s}_j)^{\text{T}}\boldsymbol{\beta} + \text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) \theta\left\{\delta\left(\textbf{s}_j\right)\right\}.
+\text{logit}\left\{p_i(\textbf{s}_j)\right\} = \text{O}_i(\textbf{s}_j) + \textbf{x}_i(\textbf{s}_j)^{\text{T}}\boldsymbol{\beta} + \text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} \theta\left(\textbf{s}_j\right).
 $$
 
 
 ## Exposure Definitions
 * Counts (exposure_definition_indicator $= 0$):
-$$\text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) = \sum_{k=1}^h 1(\text{d}_{jk} \leq \delta\left(\textbf{s}_j\right));$$
+$$\text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} = \sum_{k=1}^h 1(\text{d}_{jk} \leq \delta\left(\textbf{s}_j\right));$$
 
 * Spherical (exposure_definition_indicator $= 1$):
-$$\text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) = \sum\limits_{k=1}^{h} 1(\text{d}_{jk} \leq \delta\left(\textbf{s}_j\right)) \left(1 - 1.5\left\{\frac{\text{d}_{jk}}{\delta\left(\textbf{s}_j\right)}\right\} + 0.5\left\{\frac{\text{d}_{jk}}{\delta\left(\textbf{s}_j\right)}\right\}^3\right);$$
+$$\text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} = \sum\limits_{k=1}^{h} 1(\text{d}_{jk} \leq \delta\left(\textbf{s}_j\right)) \left(1 - 1.5\left\{\frac{\text{d}_{jk}}{\delta\left(\textbf{s}_j\right)}\right\} + 0.5\left\{\frac{\text{d}_{jk}}{\delta\left(\textbf{s}_j\right)}\right\}^3\right);$$
         
 *  Presence/absence (exposure_definition_indicator $= 2$):
-$$\text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) = \text{min} \left(\sum_{k=1}^h 1\left(d_{jk} \leq \delta\left(\textbf{s}_j\right)\right), 1\right);$$
+$$\text{z}\left\{\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right\} = \text{min} \left(\sum_{k=1}^h 1\left\{d_{jk} \leq \delta\left(\textbf{s}_j\right)\right\}, 1\right);$$
 
     *  $\text{d}_{jk}$:  Distance between location $\textbf{s}_j$ and point source $\textbf{c}_k$;
     *  $h$:  Total number of point sources.
@@ -51,29 +51,33 @@ $$\text{z}\left(\textbf{s}_j; \delta\left(\textbf{s}_j\right)\right) = \text{min
 * Radii:
 $$\Phi^{-1} \left( \frac{\delta\left(\textbf{s}_j\right) - a}{b - a}\right) = \mathbf{w}(\textbf{s}_j)^{\text{T}} \boldsymbol{\gamma} + \phi(\textbf{s}_j);$$
 
-    * $\boldsymbol{\phi}^{\text{T}} = \left(\phi\left(\textbf{s}_1\right), \hdots, \phi\left(\textbf{s}_m\right)\right) | \rho_{\phi} \sim \text{MVN}\left(\boldsymbol{0}_m, \Sigma\left(\rho_{\phi}\right)\right)$, $\Sigma_{ij}\left(\rho_{\phi}\right) = \exp\left\{-\rho_{\phi} ||\textbf{s}_i - \textbf{s}_j||\right\}$;
+    * $\boldsymbol{\phi}^{\text{T}} = \left\{\phi\left(\textbf{s}_1\right), \hdots, \phi\left(\textbf{s}_m\right)\right\} | \tau^2_{\phi}, \rho_{\phi} \sim \text{MVN}\left(\boldsymbol{0}_m, \tau^2_{\phi}\Sigma\left(\rho_{\phi}\right)\right)$, $\Sigma_{ij}\left(\rho_{\phi}\right) = \exp\left\{-\rho_{\phi} ||\textbf{s}_i - \textbf{s}_j||\right\}$;
     
     * Gaussian predictive process option also available for large $m$;
 
 
 
 * Effects:
-$$\theta\left\{\delta\left(\textbf{s}_j\right)\right\} = \displaystyle\sum_{l=0}^p \left\{\frac{\delta_j\left(\textbf{s}_j\right) - a}{b - a}\right\}^{l} \eta_l.$$
+$$\theta\left(\textbf{s}_j\right) = \textbf{q}\left(\textbf{s}_j\right)^{\text{T}}\boldsymbol{\eta}.$$
 
 ## Prior Information
-$\beta_j \stackrel{\text{iid}}{\sim} \text{N}\left(\mathbf{0}, \sigma^2_{\beta}\right),\ j=1,\hdots,p_x$;
+$\beta_j \stackrel{\text{iid}}{\sim} \text{N}\left(\mathbf{0}, \sigma^2_{\beta}\right),\ j=0,\hdots,p_x-1$;
 
 * $p_x$: Length of $\textbf{x}_i$ vector (same for all $i$), including an intercept;
 
 * Default setting: $\sigma^2_{\beta} = 100^2$;
 
-$\gamma_j \stackrel{\text{iid}}{\sim} \text{N}\left(\mathbf{0}, 1\right),\ j=1,\hdots,p_w$;
+$\gamma_j | \tau^2_{\phi} \stackrel{\text{iid}}{\sim} \text{N}\left(\mathbf{0}, \frac{1-\tau^2_{\phi}}{p_w}\right),\ j=0,\hdots,p_w - 1$;
 
 * $p_w$: Length of $\textbf{w}\left(\textbf{s}_j\right)$ vector (same for all $j$), including an intercept;
 
-$\eta_j \sim \text{N}\left(0, \sigma^2_{\eta}\right),\ j=1,\hdots,p$;
+$\eta_j \sim \text{N}\left(0, \sigma^2_{\eta}\right),\ j=0,\hdots,p_q - 1$;
+
+* $p_q$: Length of $\textbf{q}\left(\textbf{s}_j\right)$ vector (same for all $j$), including an intercept;
 
 * Default setting: $\sigma^2_{\eta} = 100^2$;
+
+$\tau_{\phi} \sim \text{Uniform}\left(0, 1\right)$;
 
 $\rho_{\phi} \sim \text{Gamma}\left(a_{\rho_{\phi}}, b_{\rho_{\phi}}\right)$;
 
@@ -94,6 +98,8 @@ Negative binomial specific:  $r \sim \text{Discrete Uniform}\left[a_r, b_r\right
 * $\gamma_j = 0$ for all $j$;
 
 * $\eta_j = 0$ for all $j$;
+
+* $\tau_{\phi} = 0.50$;
 
 * $\rho_{\phi} = -\ln\left(0.05\right)/\max\left\{||\textbf{s}_{i} - \textbf{s}_{j}||\right\}$;
 
