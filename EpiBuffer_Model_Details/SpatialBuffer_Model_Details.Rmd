@@ -109,6 +109,10 @@ Negative binomial specific:  $r \sim \text{Discrete Uniform}\left[a_r, b_r\right
 
 
 ## Additional Information
+* waic_info_indicator = 1: Provides output needed to calculate Watanabe-Akaike information criterion;
+
+* fitted_info_indicator = 1:  Provides posterior samples of fitted values;
+
 * $\text{v}$: Required input; an $\sum_{j=1}^{m}n_j$-length vector with the location number that the observation is connected to (i.e., $1,\hdots,m$);
 
 * It is recommended to scale the matrix of spatial distances by the largest observed distance in the matrix prior to running the model.

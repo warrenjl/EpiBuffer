@@ -25,14 +25,16 @@ sim_data_function <- function(exposure_indicator,
                               unique_dists,     
                               unique_ps_dists, 
                               max_radius,       
-                              trials,           
                               x,                
-                              w,                
+                              w,
+                              q,
                               v,   
                               beta_true, 
                               gamma_true, 
                               eta_true, 
-                              rho_phi_true, 
+                              tau_phi_true,
+                              rho_phi_true,
+                              sigma_epsilon_true,
                               sim_setting, 
                               seed){     
   
@@ -40,22 +42,24 @@ sim_data_function <- function(exposure_indicator,
   # Global Settings
   ################
   n_ind <- nrow(x)
-  n_unique <- ncol(v)
+  n_unique <- max(v)
   
-  spatial_cov <- exp(-rho_phi_true*unique_dists)
+  spatial_cov <- tau_phi_true*tau_phi_true*exp(-rho_phi_true*unique_dists)
   
   phi_true <- mnormt::rmnorm(n = 1,
-                             mean = 0.00, 
+                             mean = rep(0.00, times = n_unique), 
                              varcov = spatial_cov)
   
-  # extract w and phi for each individual based on location
+  # extract w, q, and phi for each individual based on location
   v_w <- w[v, , drop = FALSE]         # (n_ind x p_w)
+  v_q <- q[v, , drop = FALSE]         # (n_ind x p_q)
   v_phi <- phi_true[v , drop = FALSE] # (n_ind x 1)
   
   
   if(sim_setting == 0){ # no effect (theta = 0)
     
     radius_trans_true <- rep(0.00, times = n_ind)
+    radius_true <- as.vector(max_radius*pnorm(radius_trans_true))
     theta_true <- rep(0.00, times = n_ind)
     
   }
@@ -64,6 +68,7 @@ sim_data_function <- function(exposure_indicator,
   if(sim_setting == 1){ # single radius, single theta
     
     radius_trans_true <- rep(gamma_true[1], times = n_ind) 
+    radius_true <- as.vector(max_radius*pnorm(radius_trans_true))
     theta_true <- rep(eta_true[1], times = n_ind)
     
   }
@@ -71,6 +76,7 @@ sim_data_function <- function(exposure_indicator,
   if(sim_setting == 2){ # varying radii, single theta
     
     radius_trans_true <- (v_w%*%gamma_true) + v_phi
+    radius_true <- as.vector(max_radius*pnorm(radius_trans_true))
     theta_true <- rep(eta_true[1], times = n_ind) # theta = eta0 (pd = 0 setting)
     
   }
@@ -81,11 +87,9 @@ sim_data_function <- function(exposure_indicator,
     radius_true <- max_radius*pnorm(radius_trans_true)
     
     # theta is coefficient on the radius (not on radius_trans!)
-    theta_true <- cbind(1, (radius_true))%*%eta_true # pd = 1 setting
+    theta_true <- v_q%*%eta_true
     
   }
-  
-  radius_true <- as.vector(max_radius*pnorm(radius_trans_true))
   
   # True exposure
   exposure_true <- rep(NA, times = n_ind)
@@ -96,22 +100,19 @@ sim_data_function <- function(exposure_indicator,
   if(exposure_indicator == 2){ # presence/absence
     # exposed if at least one facility is within distance radius_true
     for(j in 1:n_ind){ 
-      exposure_true[j] <- max(
-        as.numeric(unique_ps_dists[c(1:n_unique)[v[j,] == 1],] <= radius_true[j])
-      )
+        exposure_true[j] <- max(as.numeric(unique_ps_dists[v[j], ] <= radius_true[j]))
     }
   }
   
   ###########
   # Outcome
   ###########
-  # Simulate outcome from Binomial Distribution
-  # logit(p) = log(p / 1-p) = x*\beta + \theta*exposure
-  logit_p <- x%*%beta_true + theta_true*exposure_true
-  probs <- (1.00/(1.00 + exp(-logit_p)))
-  y <- rbinom(n = n_ind,
-              size = trials,
-              p = probs)
+  # Simulate outcome from Gaussian distribution
+  # mu = x*\beta + \theta*exposure
+  mu <- x%*%beta_true + theta_true*exposure_true
+  y <- rnorm(n = n_ind,
+             mean = mu,
+             sd = sigma_epsilon_true)
   
   ################
   # Return sim dat
@@ -119,8 +120,7 @@ sim_data_function <- function(exposure_indicator,
   return(list(y = y,
               radius_true = radius_true,
               theta_true = theta_true,
-              exposure_true = exposure_true, 
-              probs_true = probs))
+              exposure_true = exposure_true))
   
 }
 
@@ -131,7 +131,7 @@ sim_data_function <- function(exposure_indicator,
 ### Specify simulation parameters
 ```{r}
 # Set seed for reproducability
-seed <- 1234
+seed <- 3478
 
 # Set all global simulation parameters
 n_ind <- 500             # total number of outcome units
@@ -144,9 +144,11 @@ exposure_indicator <- 0  # 0: counts
 ```{r}
 # True parameter values
 beta_true <- c(-0.95, 0.33)
+tau_phi_true<-1.00
 rho_phi_true <- 3.07
 gamma_true <- c(0.11, 0.07)
 eta_true_single <- 0.90
+sigma_epsilon_true <- 1.00
 ```
 
 ### Simulate location and covariate information
@@ -176,7 +178,7 @@ ps_locs <- data.frame(
   y = runif(m, min = 0, max = max_radius*5)
 )
 
-#..............Create Location Matrixes.................#
+#..............Create Location Matrices.................#
 
 # v: index vector indicating unique location row in exposure_dists for each outcome unit
 # length: n_ind
@@ -187,8 +189,7 @@ v <- match(ind_locs$location_id, unique_locs$location_id)
 
 # Grid: knot locations for predictive process approximation
 # here - same as unique locations (can be different or a subsample, as desired)
-grid_coords <- unique_locs[match(unique_locs$location, unique_locs$location_id), 
-                           c("location_id", "x", "y")]
+grid_coords <- unique_locs
 grid_coords$location_id <- paste0("grid_", grid_coords$location_id)
 
 all_locs <- rbind(unique_locs, grid_coords)
@@ -209,9 +210,6 @@ full_dists <- fields::rdist(all_locs[,c("x", "y")], all_locs[,c("x", "y")])
 full_dists <- full_dists / max(full_dists) # scale to between 0 and 1
 
 #..............Create Covariate Data.................#
-# trials: individuals per location
-# modeling Bernoulli data - each individual is a trial
-trials <- rep(1, n_ind)
 
 # x: covariate matrix
 # dim: nInd x p_x
@@ -227,6 +225,13 @@ w <- data.frame(
   w1 = rnorm(n_ind_unique, mean = 0, sd = 1)
 ) %>% as.matrix()
 
+# q: spatial covariate matrix (for SpatialBuffer) 
+# dim: n_unique x p_q
+q <- data.frame(
+  intercept = rep(1, n_ind_unique), 
+  q1 = rnorm(n_ind_unique, mean = 0, sd = 1)
+) %>% as.matrix()
+
 ```
 
 ## Create simulated data sets from different settings
@@ -236,7 +241,7 @@ Recall -
 
 * sim_setting = 1: single radius, single effect; 
 
-* sim_setting = 2: varying radius, varying effect; 
+* sim_setting = 2: varying radius, single effect; 
 
 * sim_setting = 3: varying radius, varying effect
 
@@ -245,15 +250,17 @@ Recall -
 sim_dat1 <- sim_data_function(exposure_indicator = exposure_indicator, 
                               unique_dists = unique_dists,     
                               unique_ps_dists = unique_ps_dists, 
-                              max_radius = max_radius,       
-                              trials = trials,           
+                              max_radius = max_radius,    
                               x = x,                
-                              w = w,                
+                              w = w,
+                              q = q,
                               v = v,   
                               beta_true = beta_true, 
                               gamma_true = gamma_true, 
-                              eta_true = eta_true_single, 
+                              eta_true = eta_true_single,
+                              tau_phi_true = tau_phi_true,
                               rho_phi_true = rho_phi_true, 
+                              sigma_epsilon_true = sigma_epsilon_true,
                               sim_setting = 1, 
                               seed = seed)
 
@@ -262,14 +269,16 @@ sim_dat2 <- sim_data_function(exposure_indicator = exposure_indicator,
                               unique_dists = unique_dists,     
                               unique_ps_dists = unique_ps_dists, 
                               max_radius = max_radius,       
-                              trials = trials,           
                               x = x,                
-                              w = w,                
+                              w = w,
+                              q = q,
                               v = v,   
                               beta_true = beta_true, 
                               gamma_true = gamma_true, 
-                              eta_true = eta_true_single, 
-                              rho_phi_true = rho_phi_true, 
+                              eta_true = eta_true_single,
+                              tau_phi_true = tau_phi_true,
+                              rho_phi_true = rho_phi_true,
+                              sigma_epsilon_true = sigma_epsilon_true,
                               sim_setting = 2, 
                               seed = seed)
 ```
@@ -286,6 +295,34 @@ keep_set <- seq(burnin, mcmc_samples, by = thin)
 ```
 
 ## True DGP: Single Radius, Single Effect (sim_setting = 1)
+
+### FixedBuffer
+```{r cache=TRUE}
+print("Fitting SINGLEBUFFER")
+metrop_var_radius <- 0.001
+
+set.seed(seed)
+res_fixed <- EpiBuffer::FixedBuffer(mcmc_samples = mcmc_samples,
+                                    y = sim_dat1$y, 
+                                    x = x,
+                                    q = matrix(q[,1], ncol = 1),
+                                    v = v,
+                                    radius = unique(sim_dat1$radius_true),
+                                    exposure_definition_indicator = exposure_indicator,
+                                    exposure_dists = unique_ps_dists,
+                                    likelihood_indicator = 1,
+                                    waic_info_indicator = 1,
+                                    fitted_info_indicator = 1)
+
+# Plot for theta
+plot(res_fixed$theta[1, keep_set] / res_fixed$exposure_scale,
+     main = "Estimated Theta",
+     ylab = "Theta",
+     xlab = "Index")
+abline(h = unique(sim_dat1$theta_true), col = "red", lty = 1)
+```
+
+
 ### SingleBuffer
 ```{r cache=TRUE}
 print("Fitting SINGLEBUFFER")
@@ -294,15 +331,16 @@ metrop_var_radius <- 0.001
 set.seed(seed)
 res_single <- EpiBuffer::SingleBuffer(mcmc_samples = mcmc_samples,
                                       y = sim_dat1$y, 
-                                      x = x, 
+                                      x = x,
+                                      q = matrix(q[,1], ncol = 1),
                                       v = v,
                                       radius_range = c(0.00, max_radius),
                                       exposure_definition_indicator = exposure_indicator,
                                       exposure_dists = unique_ps_dists,
                                       metrop_var_radius = metrop_var_radius,
-                                      likelihood_indicator = 0,
-                                      trials = trials,
-                                      waic_info_indicator = 1)
+                                      likelihood_indicator = 1,
+                                      waic_info_indicator = 1,
+                                      fitted_info_indicator = 1)
 
 # Plot for theta
 plot(res_single$theta[1, keep_set] / res_single$exposure_scale,
@@ -320,34 +358,36 @@ abline(h = unique(sim_dat1$radius_true), col = "red", lty = 1)
 ```
 
 
-## True DGP: Varying Radius, Varying Effect (sim_setting = 3)
-### SpatialBuffer, pd = 1
+## True DGP: Varying Radius, Varying Effect (sim_setting = 2)
+### SpatialBuffer
 ```{r cache=TRUE}
-print("Fitting SPATIALBUFFER, pd = 0") 
+print("Fitting SPATIALBUFFER") 
 
 metrop_var_gamma <- 0.01
 metrop_var_phi_star <- 0.2
+metrop_var_tau_phi <- 0.85
 metrop_var_rho_phi <- 1.0
 
 set.seed(seed)
 res_spatial1 <- EpiBuffer::SpatialBuffers(mcmc_samples = mcmc_samples,
                                           y = sim_dat2$y, 
                                           x = x, 
-                                          w = w, 
+                                          w = w,
+                                          q = matrix(q[,1], ncol = 1),
                                           v = v,
                                           radius_range = c(0.00, max_radius),
                                           exposure_definition_indicator = exposure_indicator,
                                           exposure_dists = unique_ps_dists,
-                                          p_d = 0,
                                           full_dists = full_dists,
                                           metrop_var_gamma = rep(metrop_var_gamma, 
                                                                  times = ncol(w)),
                                           metrop_var_phi_star = rep(metrop_var_phi_star, 
                                                                     times = length(v)),
+                                          metrop_var_tau_phi = metrop_var_tau_phi,
                                           metrop_var_rho_phi = metrop_var_rho_phi,
-                                          likelihood_indicator = 0,
-                                          trials = trials,
-                                          waic_info_indicator = 1)
+                                          likelihood_indicator = 1,
+                                          waic_info_indicator = 1,
+                                          fitted_info_indicator = 1)
 
 # Extract output and plot results
 radius_df <- data.frame(t(res_spatial1$radius)) # Rows = MCMC iterations; columns = outcome units

@@ -7,7 +7,7 @@ output:
 # EpiBuffer: Modeling Spatial Heterogeneity in Exposure Buffers and Risk
 
 
-## SingleBuffer Statistical Model
+## FixedBuffer Statistical Model
 
 $$
 Y_i\left(\textbf{s}_j\right) | \mu_i\left(\textbf{s}_j\right), \boldsymbol{\zeta} \stackrel{\text{ind}}{\sim} f\left(y \mid \mu_i\left(\textbf{s}_j\right), \boldsymbol{\zeta} \right),\ j=1,...,m, \ i=1,...,n_j;
@@ -15,6 +15,7 @@ $$
 $$
 g\{\mu_i(\textbf{s}_j)\} = \text{O}_i(\textbf{s}_j) + \textbf{x}_i(\textbf{s}_j)^{\text{T}} \boldsymbol{\beta} + \text{z}(\textbf{s}_j; \delta) \eta.
 $$
+* $\delta$ is selected by the user and treated as fixed.
 
 ## Likelihood Options
 * Binomial likelihood with logit link function (likelihood_indicator $= 0$): 
@@ -54,8 +55,6 @@ $\beta_j \stackrel{\text{iid}}{\sim} \text{N}\left(\mathbf{0}, \sigma^2_{\beta}\
 
 * Default setting: $\sigma^2_{\beta} = 100^2$;
 
-$\delta \sim \text{Uniform}\left(a_{\delta},b_{\delta}\right)$;
-
 $\eta \sim \text{N} \left(0, \sigma^2_{\eta}\right)$;
 
 * Default setting: $\sigma^2_{\eta} = 100^2$;
@@ -71,8 +70,6 @@ Negative binomial specific:  $r \sim \text{Discrete Uniform}\left[a_r, b_r\right
 
 ## Default Initial Values
 * $\beta_j = 0$ for all $j$;
-
-* $\delta = \frac{b_{\delta} - a_{\delta}}{2}$;
 
 * $\eta = 0$;
 
