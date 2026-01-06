@@ -85,5 +85,8 @@ Negative binomial specific:  $r \sim \text{Discrete Uniform}\left[a_r, b_r\right
 
 * fitted_info_indicator = 1:  Provides posterior samples of fitted values.
 
+## Interpretation 
+Within the function, exposure is scaled by the factor \texttt{exposure\_scale}. As a result, the fitted $\theta$ and $\eta$ values returned by the function depend on the exposure scaling factor used. The function returns the value used for scaling (\texttt{exposure\_scale}), allowing the user to unscale as desired: $\theta_{unscaled} = \theta_{scaled}/\mathrm{exposure\_scale}$ ; $\eta_{unscaled} = \eta_{scaled}/\mathrm{exposure\_scale}$.
+
 \pagebreak
 

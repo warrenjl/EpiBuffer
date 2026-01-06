@@ -115,9 +115,14 @@ Negative binomial specific:  $r \sim \text{Discrete Uniform}\left[a_r, b_r\right
 
 * $\text{v}$: Required input; an $\sum_{j=1}^{m}n_j$-length vector with the location number that the observation is connected to (i.e., $1,\hdots,m$);
 
-* It is recommended to scale the matrix of spatial distances by the largest observed distance in the matrix prior to running the model.
+* $\mathrm{exposure\_dists}$: Matrix of dimension $m \times h$ (for $h$ total exposure sources), specifying the pair-wise distances between all unique spatial locations (rows) and all exposure sources (columns). Units of $\mathrm{exposure\_dists}$ should match the units of $\mathrm{radius\_range}$ (e.g. both in kilometers)
 
-* The full_dists matrix is a $m + k$ by $m + k$ matrix where the upper left $m$ by $m$ matrix describes the distances between the $m$ observed locations, the bottom right $k$ by $k$ matrix describes the distances between the selected grid of $k<<m$ locations (if the computational version is used), and the off-diagonal matrices describe the distances between the observed and grid locations (i.e., this full distances matrix is computed after stacking the observed locations and sampled grid locations into a single vector).  If the computational version is not needed, input the observed locations instead of the sampled locations when calculating these distances.
+* $\mathrm{full\_dists}$: Matrix of dimension $(m + k) \times (m + k)$, where the upper left $m$ by $m$ matrix describes the distances between the $m$ observed locations, the bottom right $k$ by $k$ matrix describes the distances between the selected grid of $k<<m$ locations (if the computational version is used), and the off-diagonal matrices describe the distances between the observed and grid locations (i.e., this full distances matrix is computed after stacking the observed locations and sampled grid locations into a single vector). If the computational version is not needed, input the observed locations instead of the sampled grid locations when calculating these distances.
+
+* It is recommended to scale the matrix of spatial distances ($\mathrm{full\_dists}$) by the largest observed distance in the matrix prior to running the model. 
+
+## Interpretation 
+Within the function, exposure is scaled by the factor \texttt{exposure\_scale}. As a result, the fitted $\theta$ and $\eta$ values returned by the function depend on the exposure scaling factor used. The function returns the value used for scaling (\texttt{exposure\_scale}), allowing the user to unscale as desired: $\theta_{unscaled} = \theta_{scaled}/\mathrm{exposure\_scale}$ ; $\eta_{unscaled} = \eta_{scaled}/\mathrm{exposure\_scale}$.
 
 
 \pagebreak
