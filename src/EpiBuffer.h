@@ -1,6 +1,31 @@
 #ifndef __EpiBuffer__
 #define __EpiBuffer__
 
+Rcpp::List SingleBufferTemp(int mcmc_samples,
+                        arma::vec y,
+                        arma::mat x,
+                        arma::mat q,
+                        Rcpp::IntegerVector v,
+                        arma::vec radius_range,
+                        int exposure_definition_indicator,
+                        arma::mat exposure_dists,
+                        double metrop_var_radius,
+                        int likelihood_indicator,
+                        Rcpp::Nullable<int> waic_info_indicator,
+                        Rcpp::Nullable<Rcpp::NumericVector> offset,
+                        Rcpp::Nullable<Rcpp::NumericVector> trials,
+                        Rcpp::Nullable<double> a_r_prior,
+                        Rcpp::Nullable<double> b_r_prior,
+                        Rcpp::Nullable<double> a_sigma2_epsilon_prior,
+                        Rcpp::Nullable<double> b_sigma2_epsilon_prior,
+                        Rcpp::Nullable<double> sigma2_beta_prior,
+                        Rcpp::Nullable<double> sigma2_eta_prior,
+                        Rcpp::Nullable<double> r_init,
+                        Rcpp::Nullable<double> sigma2_epsilon_init,
+                        Rcpp::Nullable<Rcpp::NumericVector> beta_init,
+                        Rcpp::Nullable<Rcpp::NumericVector> eta_init,
+                        Rcpp::Nullable<double> radius_init);
+
 arma::vec rcpp_pgdraw(arma::vec b, 
                       arma::vec c);
 
